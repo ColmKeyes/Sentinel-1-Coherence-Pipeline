@@ -6,29 +6,6 @@
 @File    : Backscatter_Preprocessing
 """
 
-###########
-## Example code:
-## https://github.com/wajuqi/Sentinel-1-preprocessing-using-Snappy
-###########
-
-## Snappy requires python version 3.6 or below.
-
-import datetime
-import time
-from snappy import ProductIO
-from snappy import HashMap
-from snappy import WKTReader
-## Garbage collection to release memory of objects no longer in use.
-import os, gc
-from snappy import GPF
-import shapefile
-#import pygeoif
-#import jpy
-import zipfile
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-import pandas as pd
 import Sentinel_1_SLC_Preprocessing as slc
 
 pols = 'VV' #'VH,VV'
