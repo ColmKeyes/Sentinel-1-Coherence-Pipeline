@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 """
+This script plots coherence change detection for a given date
+"""
+"""
 @Time    : 11/01/2023 18:22
 @Author  : Colm Keyes
 @Email   : keyesco@tcd.ie
 @File    : plot_ccd
 """
+
+##################
+## Credit: https://github.com/insarlab/MintPy-tutorial/blob/main/applications/coherence_change_detection.ipynb
+##################
 
 import os
 import sys

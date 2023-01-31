@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """
+This script animates a stack of tiffs & saves to mp4
+"""
+"""
 @Time    : 11/01/2023 14:52
 @Author  : Colm Keyes
 @Email   : keyesco@tcd.ie

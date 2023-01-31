@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """
+This script provides interface to Sentinel-1 preprocessing through SNAP's Graph Processing Framework defined in Javascript
+"""
+"""
 @Time    : 07/12/2022 13:39
 @Author  : Colm Keyes
 @Email   : keyesco@tcd.ie

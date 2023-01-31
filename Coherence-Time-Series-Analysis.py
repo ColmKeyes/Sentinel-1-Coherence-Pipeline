@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """
+This script provides functions for building data-cubes from SLC processed coherence and backscatter data
+"""
+"""
 @Time    : 04/01/2023 21:56
 @Author  : Colm Keyes
 @Email   : keyesco@tcd.ie
@@ -54,14 +57,13 @@ def write_rasterio_stack(path, write_file, titles=None ):
         dst.close()
 
 def build_cube(tiff_stacks, shp=None ):
+    ## shp = polygon shape files
 
     if shp is None:
-        ## Read in using rioxarray,
         stack_coherence = rioxarray.open_rasterio(tiff_stacks[0], masked=False)
         stack_backscatter = rioxarray.open_rasterio(tiff_stacks[1], masked=False)
 
-        ## open_rasterio opens as xarray Dataarrays, we must convert to
-        ## Datasets before combining both into a data-cube..
+        ## open_rasterio opens as xarray DataArrays, we must convert to Datasets before combining both into a data-cube..
         stack_coherence = stack_coherence.to_dataset(name='coherence')
         stack_backscatter = stack_backscatter.to_dataset(name='backscatter')
 
@@ -108,4 +110,7 @@ if __name__ == '__main__':
 
     cube = build_cube(tiff_stack=tiff_stack)
     zonal_stats = calc_zonal_stats(cube)
+
+    print(cube)
+    print(zonal_stats)
 
