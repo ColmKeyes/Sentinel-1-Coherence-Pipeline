@@ -14,12 +14,18 @@ Coherence can be an affective supplimental data source for backscatter based sys
 Here, I present a pipeline for processing Sentinel-1 SLC data to produce Xarray data-cubes containing both coherence and 
 backscatter time series. 
 -->
-Contains:
-Coherence and backscatter processing from SLC & ASF SBAS Pairs.
-Xarray data-cube production, combining polarisations and varying window sizes.
 
-Utility:
-Produce animation of tiff stack.
-calculate coherence change over time.
-plot coherence change detection.
+### Contents:
+Thesis Proposal,\
+Interface to Sentinel-1 preprocessing through SNAPPY,\
+Coherence and backscatter processing from SLC & ASF SBAS Pairs,\
+Functions for Xarray data-cube production, combining polarisations and varying window sizes,\
+Coherence change detection based on Mintpy: https://github.com/insarlab/MintPy-tutorial/blob/main/applications/coherence_change_detection.ipynb
+
+### Utility:
+Produce animation of tiff stack.\
+calculate coherence change over time and plot coherence change detection.\
+
+
+
 
