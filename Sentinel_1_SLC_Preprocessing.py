@@ -298,26 +298,3 @@ def main(pols,
             sentinel_1_2.closeIO()
         print("--- %s seconds ---" % (time.time() - start_time))
 
-
-
-
-# if __name__== "__main__":
-#     pols = 'VH' #'VH,VV'
-#     iw_swath = 'IW2'
-#     first_burst_index = 4
-#     last_burst_index = 7
-#     product_type = 'GeoTIFF'
-#     outpath = 'D:\Data\Results\Coherence_Results'
-#     coh_window_size = [[2,10],[3,15],[4,20]] ## will not take 1 as a param! [1,5]
-#     for ix, i in enumerate(coh_window_size):
-#         main(pols,
-#              iw_swath,
-#              first_burst_index,
-#              last_burst_index,
-#              coh_window_size[ix],
-#              mode='coherence',
-#              speckle_filter='Lee',
-#              speckle_filter_size=[5,5],
-#              product_type=product_type,
-#              outpath = outpath + '\\pol_'+str(pols) + '_coh_window_' + str(coh_window_size[ix][0]*coh_window_size[ix][1]))
-#

@@ -22,7 +22,7 @@ if mode == 'backscatter':
      outpath_window = '_multilook_window_'
 elif mode == 'coherence':
      outpath_window = '_coherence_window_'
-multilook_window_size = [[2,10],[3,15],[4,20]] ## will not take 1 as a param! [1,5]
+multilook_window_size = [[2,10],[3,15],[4,20]]
 
 for ix, i in enumerate(multilook_window_size):
     slc.main(pols,

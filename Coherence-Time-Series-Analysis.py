@@ -57,7 +57,7 @@ def write_rasterio_stack(path, write_file, titles=None ):
         dst.close()
 
 def build_cube(tiff_stacks, shp=None ):
-    ## shp = polygon shape files
+    ## two slightly different ways to build an xarray datacube
 
     if shp is None:
         stack_coherence = rioxarray.open_rasterio(tiff_stacks[0], masked=False)
@@ -70,12 +70,16 @@ def build_cube(tiff_stacks, shp=None ):
         cube = xarray.merge([stack_coherence, stack_backscatter])
 
     if shp is not None:
-        shp_stack = rioxarray.open_rasterio(tiff_stacks[0], masked=True).rio.clip(
+
+        shp_stack_backscatter = rioxarray.open_rasterio(tiff_stacks[0], masked=True).rio.clip(
             shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
 
-        shp_stack_backscatter = rioxarray.open_rasterio(tiff_stacks[1], masked=True).rio.clip(
+
+        shp['code'] = shp.index + 1
+        shp_stack = rioxarray.open_rasterio(tiff_stacks[1], masked=True).rio.clip(
             shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
 
+        shp['code'] = shp.index + 1
         shp_stack_backscatter['code']= shp_stack_backscatter.band +1
 
         cube = make_geocube(shp,like=shp_stack ,measurements=['code'])
@@ -101,16 +105,62 @@ def calc_zonal_stats(cube):
 
 
 if __name__ == '__main__':
+
+    # if stack does not exist
     path = 'D:\Data\Results\Coherence_Results\pol_VV_coh_window_45'
+    shp_gcp = gpd.read_file('D:\Data\\all_ground_control_points_Point.shp')
     titles = []
     tiff_stack=[]
     for ix, layer in enumerate(os.listdir(path[:34])):  ## look at upper layer in path..
-        write_rasterio_stack(layer, f'{layer}.tif')
+        write_rasterio_stack(path, f'{layer}.tif')
         tiff_stack.append(layer)
+    tiff_stack = ['backscatter_stack.tif','pol_VH_coh_window_20.tif']
+    cube = build_cube(tiff_stacks=tiff_stack, shp =shp_gcp )
 
-    cube = build_cube(tiff_stack=tiff_stack)
+
     zonal_stats = calc_zonal_stats(cube)
+    zonal_transpose = zonal_stats.unstack(level='code')
+    coh_mean_df = zonal_transpose.coherence_mean
+    coh_mean_df.columns = ['Main_Large', '7th_Compact', '2nd_Compact', '1st_Compact', 'Urban', 'Central_Kalimantan','3rd_Compact', '2nd_Sporadtic' ,'5th_Compact']
+
+    # plt.imshow(coh_std_df[0])
+    plt.plot(coh_mean_df.index, coh_mean_df, label=coh_mean_df.columns)
+    plt.yticks([0, 0.5])
+    plt.legend()
+    plt.show()
+    plt.pause(1000)
 
     print(cube)
     print(zonal_stats)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
