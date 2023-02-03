@@ -83,6 +83,7 @@ def apply_orbit_file(source):
     parameters.put('orbitType', 'Sentinel Precise (Auto Download)')
     parameters.put('polyDegree', '3')
     parameters.put('continueOnFail', 'false')
+    print(source.getBand(source.getBandNames()[0]))
     output = GPF.createProduct('Apply-Orbit-File', parameters, source)
     return output
 
@@ -92,6 +93,7 @@ def back_geocoding(sources):
     parameters = HashMap()
     parameters.put('demName','SRTM 3Sec')
     parameters.put('externalDEMNoDataValue',0.0)
+    print(sources[0].getBand(sources[0].getBandNames()[0]))
     parameters.put('demResamplingMethod', 'BILINEAR_INTERPOLATION') ## Perhaps give as a param...
     parameters.put('maskOutAreaWithoutElevation','false')
     parameters.put('outputRangeAzimuthOffset','false')
@@ -124,6 +126,7 @@ def coherence_(source, coh_window_size):
     parameters = HashMap()
     parameters.put('cohWinAz',coh_window_size[0])#3)
     parameters.put('cohWinRg',coh_window_size[1])#15)
+    print(source.getBand(source.getBandNames()[0]))
     parameters.put('subtractFlatEarthPhase',False)
     parameters.put('srpPolynomialDegree',5)
     parameters.put('srpNumberPoints',501)
@@ -203,7 +206,7 @@ def main(pols,
 
     SLC_path = r'D:\Data\SLC'
     shapes = r'C:\Users\Lord Colm\Desktop\InSAR Thesis\Data\Primary_Disturbance-polygon.shp'
-    path_asf_csv = r'D:\Data\asf-sbas-pairs_24d_35m_Jun20_Dec22.csv'
+    path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'#asf-sbas-pairs_24d_35m_Jun20_Dec22.csv'
 
     shpfile = 'D:\Data\geometry_Polygon.shp'
     if not os.path.exists(outpath):
@@ -238,6 +241,8 @@ def main(pols,
             band_names = sentinel_1_1.getBandNames()
             print("Band names: {}".format(", ".join(band_names)))
 
+            #thermalnoisereduction_1 = thermal_noise_reduction(sentinel_1_1,pols)
+            #thermalnoisereduction_2 = thermal_noise_reduction(sentinel_1_2,pols)
             topsarsplit_1 = topsar_split(sentinel_1_1,pols,iw_swath,first_burst_index,last_burst_index)
             applyorbit_1 = apply_orbit_file(topsarsplit_1)
             topsarsplit_2 = topsar_split(sentinel_1_2,pols,iw_swath,first_burst_index,last_burst_index)
@@ -246,7 +251,9 @@ def main(pols,
             coherence = coherence_(backgeocoding,coh_window_size)
             topsardeburst = topsar_deburst(coherence,pols)
             terraincorrection = terrain_correction(topsardeburst,coh_window_size)#,proj)
-            speckle = speckle_filtering(terraincorrection, speckle_filter, speckle_filter_size)
+
+            #del thermalnoisereduction_1
+            #del thermalnoisereduction_2
             del applyorbit_1
             del applyorbit_2
             del topsarsplit_1
@@ -254,7 +261,6 @@ def main(pols,
             del backgeocoding
             del coherence
             del topsardeburst
-            del terraincorrection
 
 
         elif mode == 'backscatter':
@@ -278,6 +284,7 @@ def main(pols,
             terraincorrection = terrain_correction(multilook,coh_window_size)#,proj)
             speckle = speckle_filtering(terraincorrection, speckle_filter, speckle_filter_size)
 
+            del thermalnoisereduction
             del applyorbit_1
             del topsarsplit_1
             del calibration
@@ -288,13 +295,20 @@ def main(pols,
         print("Plotting...")
         #plotBand(speckle, 'coh_IW2_VV_02Mar2021_18Feb2021', 0, 1)
         print("Writing...")
-        ProductIO.writeProduct(speckle, outpath + '\\' + primary[:25] +'_'+ secondary[17:25]+'_pol_'+str(pols) +'_coherence_window_'+ str(coh_window_size[0]*coh_window_size[1]), product_type)#'BEAM-DIMAP')
+        write_tiff_path = outpath + '\\' + primary[:25] +'_'+ secondary[17:25]+'_pol_'+str(pols) +'_coherence_window_'+ str(coh_window_size[0]*coh_window_size[1])
+
+        if not os.path.exists(write_tiff_path+'.tif'):
+            ProductIO.writeProduct(terraincorrection, write_tiff_path, product_type)#'BEAM-DIMAP')
         print('Done.')
-        del speckle
+        #del speckle
         sentinel_1_1.dispose()
         sentinel_1_1.closeIO()
         if mode == 'coherence':
             sentinel_1_2.dispose()
             sentinel_1_2.closeIO()
+            del terraincorrection
         print("--- %s seconds ---" % (time.time() - start_time))
 
+
+
+#snappy thermal noise doesn't work for coherence
