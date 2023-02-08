@@ -282,31 +282,44 @@ def main(pols,
             topsardeburst = topsar_deburst(calibration,pols)
             multilook = multi_look(topsardeburst,coh_window_size)
             terraincorrection = terrain_correction(multilook,coh_window_size)#,proj)
-            speckle = speckle_filtering(terraincorrection, speckle_filter, speckle_filter_size)
+            #speckle = speckle_filtering(terraincorrection, speckle_filter, speckle_filter_size)
 
             del thermalnoisereduction
             del applyorbit_1
             del topsarsplit_1
             del calibration
             del topsardeburst
-            del terraincorrection
             del multilook
+            #del terraincorrection
 
         print("Plotting...")
         #plotBand(speckle, 'coh_IW2_VV_02Mar2021_18Feb2021', 0, 1)
         print("Writing...")
-        write_tiff_path = outpath + '\\' + primary[:25] +'_'+ secondary[17:25]+'_pol_'+str(pols) +'_coherence_window_'+ str(coh_window_size[0]*coh_window_size[1])
 
-        if not os.path.exists(write_tiff_path+'.tif'):
-            ProductIO.writeProduct(terraincorrection, write_tiff_path, product_type)#'BEAM-DIMAP')
-        print('Done.')
-        #del speckle
-        sentinel_1_1.dispose()
-        sentinel_1_1.closeIO()
+
+
+
         if mode == 'coherence':
+            write_tiff_path = outpath + '\\' + primary[:25] + '_' + secondary[17:25] + '_pol_' + str(pols) + '_coherence_window_' + str(coh_window_size[0] * coh_window_size[1])
+            if not os.path.exists(write_tiff_path + '.tif'):
+                ProductIO.writeProduct(terraincorrection, write_tiff_path, product_type)  # 'BEAM-DIMAP')
+            sentinel_1_1.dispose()
+            sentinel_1_1.closeIO()
             sentinel_1_2.dispose()
             sentinel_1_2.closeIO()
             del terraincorrection
+
+        elif mode == "backscatter":
+            write_tiff_path = outpath + '\\' + primary[:25] + '_pol_' + str(pols) + '_backscatter_multilook_window_' + str(coh_window_size[0] * coh_window_size[1])
+            if not os.path.exists(write_tiff_path + '.tif'):
+                ProductIO.writeProduct(terraincorrection, write_tiff_path, product_type)  # 'BEAM-DIMAP')
+            sentinel_1_1.dispose()
+            sentinel_1_1.closeIO()
+            del terraincorrection
+            #del speckle
+
+        print('Done.')
+        #del speckle
         print("--- %s seconds ---" % (time.time() - start_time))
 
 
