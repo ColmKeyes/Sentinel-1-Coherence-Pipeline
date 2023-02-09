@@ -60,14 +60,15 @@ def write_rasterio_stack(path, write_file, titles=None ):
     with rasterio.open(path + '\\' +str(os.listdir(path)[0])) as src0:
         meta = src0.meta
     meta.update(count=len(os.listdir(path)))
-
+    titles = []
     with rasterio.open(write_file, 'w', **meta) as dst:
         for ix, layer in enumerate(os.listdir(path), start=1):
             with rasterio.open(path + '\\' +str(layer)) as src1:
-#                titles.append([str(layer)[17:-4]]) ## get list of image dates..
+                titles.append(str(layer)[17:25]) ## get list of image dates..
                 dst.write_band(ix, pct_clip(src1.read(1)))
         print(f'Total Images stacked: {ix}')
         dst.close()
+        return titles
 
 def build_cube(tiff_stacks, shp=None ):
     ## two slightly different ways to build an xarray datacube
@@ -96,16 +97,22 @@ def build_cube(tiff_stacks, shp=None ):
         shp_stack_backscatter_VH = rioxarray.open_rasterio(tiff_stacks[2], masked=True).rio.clip(
             shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
 
+        shp_stack_coh_VH = rioxarray.open_rasterio(tiff_stacks[3], masked=True).rio.clip(
+            shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
+
+
         shp['code'] = shp.index + 1
         shp_stack_backscatter['code']= shp_stack_backscatter.band +1
         shp_stack_backscatter_VH['code']= shp_stack_backscatter_VH.band +1
+        shp_stack_coh_VH['code']= shp_stack_coh_VH.band +1
 
 
 
         cube = make_geocube(shp,like=shp_stack ,measurements=['code'])
-        cube['coherence'] = (shp_stack.dims,shp_stack.values,shp_stack.attrs,shp_stack.encoding)
+        cube['coherence_VV'] = (shp_stack.dims,shp_stack.values,shp_stack.attrs,shp_stack.encoding)
+        cube["coherence_VH"] = (shp_stack_coh_VH.dims, shp_stack_coh_VH.values,shp_stack_coh_VH.attrs,shp_stack_coh_VH.encoding)
         ## squeezing last weird dim length...
-        cube = cube.isel(x=range(0, 142), drop=True)
+        cube = cube.isel(x=range(0, 142),drop=True)#x=142), drop=True)#y=133
         cube["backscatter_VV"] = (shp_stack_backscatter.dims, shp_stack_backscatter.values,shp_stack_backscatter.attrs,shp_stack_backscatter.encoding)
         cube["backscatter_VH"] = (shp_stack_backscatter_VH.dims, shp_stack_backscatter_VH.values,shp_stack_backscatter_VH.attrs,shp_stack_backscatter_VH.encoding)
 
@@ -128,16 +135,20 @@ def calc_zonal_stats(cube):
 #def stat_analysis(cube):   Next up...
 
 
+
+
+
 if __name__ == '__main__':
 
     # if stack does not exist
     path = 'D:\Data\Results\Coherence_Results\pol_VV_coherence_window_500'
     bsc_path = 'D:\Data\Results\Coherence_Results\pol_VV_backscatter_multilook_window_500'
     bsc_path_VH = 'D:\Data\Results\Coherence_Results\pol_VH_backscatter_multilook_window_500'
+    coh_path_VH = 'D:\Data\Results\Coherence_Results\pol_VH_coherence_window_500'
     shp1 = gpd.read_file('D:\Data\\geometries\\all_ground_control_points_2_Point_backup_Point.shp')
     shp2 = gpd.read_file("D:\Data\\geometries\\all_ground_control_points_Point_1_Point_backup_Point.shp")
     shp = shp1.append(shp2)
-    shp = shp.reset_index(drop='index')
+    #shp = shp.reset_index(drop='index')
     shp = gpd.read_file('combiend_polygons.shp')
     shp['code'] = shp.index + 1
     shp1['code'] = shp1.index + 1
@@ -145,14 +156,18 @@ if __name__ == '__main__':
     tiff_stack=[]
 
     #for ix, layer in enumerate(os.listdir(path[:34])):  ## look at upper layer in path..
-    write_rasterio_stack(path, f"{path[34:]}.tif")   #f'{layer}.tif')
+    titles=write_rasterio_stack(path, f"{path[34:]}.tif")   #f'{layer}.tif')
     write_rasterio_stack(bsc_path, f"{bsc_path[34:]}.tif")   #f'{layer}.tif')
     write_rasterio_stack(bsc_path_VH, f"{bsc_path_VH[34:]}.tif")  # f'{layer}.tif')
+    write_rasterio_stack(coh_path_VH, f"{coh_path_VH[34:]}.tif")  # f'{layer}.tif')
+
 
     #tiff_stack.append(layer)
-    tiff_stack = [f"{bsc_path[34:]}.tif",f"{path[34:]}.tif",f"{bsc_path_VH[34:]}.tif"]
+    tiff_stack = [f"{bsc_path[34:]}.tif",f"{path[34:]}.tif",f"{bsc_path_VH[34:]}.tif",f"{coh_path_VH[34:]}.tif"]
     #cube = build_cube(tiff_stacks=tiff_stack, shp =shp )
     cube = build_cube(tiff_stacks=tiff_stack, shp =shp )
+    coh_dates = pd.to_datetime(pd.Series(titles))
+    cube['dates'] = coh_dates
 
     path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'#asf-sbas-pairs_24d_35m_Jun20_Dec22.csv'
     asf_df = pd.read_csv(path_asf_csv)
@@ -163,10 +178,11 @@ if __name__ == '__main__':
     zonal_stats = cube.groupby(cube.code)#calc_zonal_stats(cube)
     zonal_stats = zonal_stats.mean()#.rename({"coherence": "coherence_mean"})
     #zonal_transpose = zonal_stats.unstack(level='code')
-    coh_mean_df = zonal_stats.coherence #zonal_transpose.coherence_mean
+    coh_mean_df = zonal_stats.coherence_VV #zonal_transpose.coherence_mean
     bsc_VV_mean_df = zonal_stats.backscatter_VV
     bsc_VH_mean_df = zonal_stats.backscatter_VH
-    #coh_mean_df.columns = ['Main_Large', '7th_Compact', '2nd_Compact', '1st_Compact', 'Urban', 'Central_Kalimantan','3rd_Compact', '2nd_Sporadtic' ,'5th_Compact']
+    coh_VH_mean_df = zonal_stats.coherence_VH
+    titles = ['Main_Large', '7th_Compact', '2nd_Compact', '1st_Compact', 'Urban', 'Central_Kalimantan','3rd_Compact', '2nd_Sporadtic' ,'5th_Compact']
 
     # plt.imshow(coh_std_df[0])
     # plt.scatter(coh_mean_df.index,pct_clip(perp_dist_diff))
@@ -177,6 +193,42 @@ if __name__ == '__main__':
     # plt.show()
     # plt.pause(1000)
 
+    # Import Meteostat library and dependencies
+    from datetime import datetime
+    import matplotlib.pyplot as plt
+    from meteostat import Point, Daily
+
+    # Set time period
+    start = datetime(2021, 1, 1)
+    end = datetime(2023, 1, 31)
+
+    # Create Point for Vancouver, BC
+    # location = Point(49.2497, -123.1193, 70) #-1.8, 113.5, 0
+
+    # Get daily data for 2018
+    data = Daily(96655, start, end)
+    data = data.fetch()
+
+    # Plot line chart including average, minimum and maximum temperature
+    # data.plot(y=['prcp'])#tavg', 'tmin', 'tmax'])
+    # plt.show()
+    # plt.pause(10)
+    # start = datetime(2021, 1, 1)
+    # end = datetime(2021, 12, 31)
+    # a=Daily(96655,start,end)
+
+    # data['Date'] = pd.to_datetime(data.index) - pd.to_timedelta(7, unit='d')
+    # prcp = data.groupby([pd.Grouper(key='Date', freq='W-MON')])['prcp'].sum().reset_index().sort_values('Date')
+
+    prcp = data.groupby(pd.cut(data.index, cube.dates)).mean()['prcp'].to_frame()
+    prcp['dates'] = cube.dates[:-1]  ## one less date as this is change between dates..
+    prcp.name = 'Precipitation'
+
+
+
+
+
+
     fig, ax = plt.subplots(5, 2, figsize=(21, 7))
     # plt.suptitle('combined groundtruth 47:73')
     a = 0
@@ -184,11 +236,13 @@ if __name__ == '__main__':
         for j in range(2):
             # plt.subplot(4,4,i+1)
             try:
-                ax[i,j].plot(coh_mean_df.band, coh_mean_df[a], label=coh_mean_df.name)
-                ax[i,j].scatter(coh_mean_df.band,pct_clip(perp_dist_diff),label=perp_dist_diff.name)
-                ax[i,j].plot(bsc_VV_mean_df.band, bsc_VV_mean_df[a],label=bsc_VV_mean_df.name)#, label=coh_mean_df.columns)
-                ax[i,j].plot(bsc_VH_mean_df.band, bsc_VH_mean_df[a],label=bsc_VH_mean_df.name)#, label=coh_mean_df.columns)
-
+                ax[i,j].plot(cube.dates, coh_mean_df[a], label=coh_mean_df.name)
+                ax[i,j].scatter(cube.dates,pct_clip(perp_dist_diff),label=perp_dist_diff.name)
+                ax[i,j].plot(cube.dates, bsc_VV_mean_df[a],label=bsc_VV_mean_df.name)#, label=coh_mean_df.columns)
+                ax[i,j].plot(cube.dates, bsc_VH_mean_df[a],label=bsc_VH_mean_df.name)#, label=coh_mean_df.columns)
+                ax[i,j].plot(cube.dates, coh_VH_mean_df[a],label=coh_VH_mean_df.name)#, label=coh_mean_df.columns)
+                ax[i, j].scatter(prcp.dates, pct_clip(prcp.prcp),label = prcp.name )
+                ax[i, j].set_title(titles[a])
             except KeyError:
                 continue
             except IndexError:
@@ -207,6 +261,7 @@ if __name__ == '__main__':
     lines_labels = [[line for line,label in zip(*lines_labels)],[label for line,label in zip(*lines_labels)]]
     # Finally, the legend (that maybe you'll customize differently)
     fig.legend(lines_labels[0], lines_labels[1], loc='upper center', ncol=4)
+    fig.tight_layout()
     plt.show()
     #plt.show()
     plt.pause(10)
@@ -225,39 +280,39 @@ if __name__ == '__main__':
 
 
 
-# # Import Meteostat library and dependencies
-# from datetime import datetime
-# import matplotlib.pyplot as plt
-# from meteostat import Point, Daily
-#
-# # Set time period
-# start = datetime(2020, 6, 1)
-# end = datetime(2022, 12, 31)
-#
-# # Create Point for Vancouver, BC
-# #location = Point(49.2497, -123.1193, 70) #-1.8, 113.5, 0
-#
-# # Get daily data for 2018
-# data = Daily(96655, start, end)
-# data = data.fetch()
-#
-# # Plot line chart including average, minimum and maximum temperature
-# data.plot(y=['tavg', 'tmin', 'tmax'])
-# plt.show()
-# plt.pause(10)
-# # start = datetime(2021, 1, 1)
-# # end = datetime(2021, 12, 31)
-# # a=Daily(96655,start,end)
-#
-#
-# df['Date'] = pd.to_datetime(df['Date']) - pd.to_timedelta(7, unit='d')
-# df = df.groupby(['Name', pd.Grouper(key='Date', freq='W-MON')])['Quantity']
-#     .sum()
-#     .reset_index()
-#     .sort_values('Date')
-# print (df)
-#
-#
+# Import Meteostat library and dependencies
+from datetime import datetime
+import matplotlib.pyplot as plt
+from meteostat import Point, Daily
+
+# Set time period
+start = datetime(2021, 1, 1)
+end = datetime(2023, 1, 31)
+
+# Create Point for Vancouver, BC
+#location = Point(49.2497, -123.1193, 70) #-1.8, 113.5, 0
+
+# Get daily data for 2018
+data = Daily(96655, start, end)
+data = data.fetch()
+
+# Plot line chart including average, minimum and maximum temperature
+data.plot(y=['prcp'])#tavg', 'tmin', 'tmax'])
+plt.show()
+plt.pause(10)
+# start = datetime(2021, 1, 1)
+# end = datetime(2021, 12, 31)
+a=Daily(96655,start,end)
+
+
+#data['Date'] = pd.to_datetime(data.index) - pd.to_timedelta(7, unit='d')
+#prcp = data.groupby([pd.Grouper(key='Date', freq='W-MON')])['prcp'].sum().reset_index().sort_values('Date')
+
+prcp = data.groupby(pd.cut(data.index,cube.dates)).sum()['prcp']
+prcp['dates']= cube.dates[:-1] ## one less date as this is change between dates..
+df.plot(y=['prcp'])
+plt.show()
+plt.pause(100)
 
 
 
