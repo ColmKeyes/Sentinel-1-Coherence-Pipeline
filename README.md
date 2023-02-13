@@ -26,6 +26,18 @@ Coherence change detection based on Mintpy: https://github.com/insarlab/MintPy-t
 Produce animation of tiff stack.\
 calculate coherence change over time and plot coherence change detection.\
 
+### Pipeline creation:
+Pipeline creation with Snappy. 
 
 
+Here, insert a few images to compare two areas for a range of coherence windows, al;so imput my precipiation and perp distance measures..
 
+
+### Analysis:
+Time series analysis of coherece and backscatter change.
+
+For my analysis,. show the time series of the change in coherence anmd backscattter, and talk about my results so far with them..
+
+
+To-Do:
+some "simple" modelling...
