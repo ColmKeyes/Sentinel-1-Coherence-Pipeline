@@ -61,7 +61,7 @@ def pct_clip(array,pct=[2,98]):#.02,99.98]):
 
 
 
-def write_rasterio_stack(path, write_file, titles=None ):
+def write_rasterio_stack(path, write_file, titles=None,write=True ):
     ## Path = path to folder containing tiffs...
 
     ## get sample metadata..
@@ -73,7 +73,8 @@ def write_rasterio_stack(path, write_file, titles=None ):
         for ix, layer in enumerate(os.listdir(path), start=1):
             with rasterio.open(path + '\\' +str(layer)) as src1:
                 titles.append(str(layer)[17:25]) ## get list of image dates..
-                dst.write_band(ix, pct_clip(src1.read(1)))
+                if write == True:
+                    dst.write_band(ix, pct_clip(src1.read(1)))
         print(f'Total Images stacked: {ix}')
         dst.close()
         return titles
@@ -179,10 +180,10 @@ def calc_zonal_stats(cube):
 if __name__ == '__main__':
 
     # if stack does not exist
-    path = 'D:\Data\Results\Coherence_Results\pol_VV_coherence_window_500'
-    bsc_path = 'D:\Data\Results\Coherence_Results\pol_VV_backscatter_multilook_window_500'
-    bsc_path_VH = 'D:\Data\Results\Coherence_Results\pol_VH_backscatter_multilook_window_500'
-    coh_path_VH = 'D:\Data\Results\Coherence_Results\pol_VH_coherence_window_500'
+    path = 'D:\Data\Results\Coherence_Results\\500m_window\\pol_VV_coherence_window_500'#20'#500
+    bsc_path = 'D:\Data\Results\Coherence_Results\\500m_window\\pol_VV_backscatter_multilook_window_500'#500'
+    bsc_path_VH = 'D:\Data\Results\Coherence_Results\\500m_window\\pol_VH_backscatter_multilook_window_500'#500'
+    coh_path_VH = 'D:\Data\Results\Coherence_Results\\500m_window\\pol_VH_coherence_window_500'#500'
     #shp1 = gpd.read_file('D:\Data\\geometries\\all_ground_control_points_2_Point_backup_Point.shp')
     #shp2 = gpd.read_file("D:\Data\\geometries\\all_ground_control_points_Point_1_Point_backup_Point.shp")
     forest_baseline_polygon = gpd.read_file("D:\Data\\geometries\\Forest_Baseline_Polygon.shp")
@@ -203,33 +204,39 @@ if __name__ == '__main__':
     #shp1['code'] = shp1.index + 1
     #titles = []
     tiff_stack=[]
+    results_path = 'D:\\Data\\Results'
+    #for ix, layer in enumerate(os.listdir(path[:45])):  ## look at upper layer in path..
+    #if not os.path.exists(f"{results_path}\\{path[45:]}.tif"):
+    titles=write_rasterio_stack(path, f"{results_path}\\{path[45:]}.tif")
+    #titles=write_rasterio_stack(path, f"{results_path}\\{path[45:]}.tif",write=False)   #f'{layer}.tif') ## titles =
 
-    #for ix, layer in enumerate(os.listdir(path[:34])):  ## look at upper layer in path..
-    titles=write_rasterio_stack(path, f"{path[34:]}.tif")   #f'{layer}.tif')
-    write_rasterio_stack(bsc_path, f"{bsc_path[34:]}.tif")   #f'{layer}.tif')
-    write_rasterio_stack(bsc_path_VH, f"{bsc_path_VH[34:]}.tif")  # f'{layer}.tif')
-    write_rasterio_stack(coh_path_VH, f"{coh_path_VH[34:]}.tif")  # f'{layer}.tif')
+    if not os.path.exists(f"{results_path}\\{bsc_path[45:]}.tif"):
+        write_rasterio_stack(bsc_path, f"{results_path}\\{bsc_path[45:]}.tif")   #f'{layer}.tif')
+    if not os.path.exists(f"{results_path}\\{bsc_path_VH[45:]}.tif"):
+        write_rasterio_stack(bsc_path_VH, f"{results_path}\\{bsc_path_VH[45:]}.tif")  # f'{layer}.tif')
+    if not os.path.exists(f"{results_path}\\{coh_path_VH[45:]}.tif"):
+        write_rasterio_stack(coh_path_VH, f"{results_path}\\{coh_path_VH[45:]}.tif")  # f'{layer}.tif')
 
 
     #tiff_stack.append(layer)
-    tiff_stack = [f"{bsc_path[34:]}.tif",f"{path[34:]}.tif",f"{bsc_path_VH[34:]}.tif",f"{coh_path_VH[34:]}.tif"]
+    tiff_stack = [f"{results_path}\\{bsc_path[45:]}.tif",f"{results_path}\\{path[45:]}.tif",f"{results_path}\\{bsc_path_VH[45:]}.tif",f"{results_path}\\{coh_path_VH[45:]}.tif"]
     #cube = build_cube(tiff_stacks=tiff_stack, shp =shp )
     cube = build_cube(tiff_stacks=tiff_stack, shp =shp )
     coh_dates = pd.to_datetime(pd.Series(titles))
     cube['dates'] = coh_dates
-
-
-    radd = rioxarray.open_rasterio("D:/Data/Radd_Alert.tif", masked=True).rio.clip(
-            shp.geometry.values, shp.crs, from_disk=True) ##.rio.reproject_match(cube)
-
-    radd_cube = make_geocube(shp, like=radd, measurements=['code'])
-    radd_cube["alert_date"] = (radd.dims, radd.values, radd.attrs,radd.encoding)
-    radd_stats = radd_cube.groupby(radd_cube.code)
-
-    radd_count = radd_stats.count()
-    radd_count["alert_dates"] = (radd.dims, radd.values, radd.attrs,radd.encoding)
-
-    radd_count['dates'] =  datetime.strptime(radd_cube.alert_date, '%y%j')
+    #
+    #
+    # radd = rioxarray.open_rasterio("D:/Data/Radd_Alert.tif", masked=True).rio.clip(
+    #         shp.geometry.values, shp.crs, from_disk=True) ##.rio.reproject_match(cube)
+    #
+    # radd_cube = make_geocube(shp, like=radd, measurements=['code'])
+    # radd_cube["alert_date"] = (radd.dims, radd.values, radd.attrs,radd.encoding)
+    # radd_stats = radd_cube.groupby(radd_cube.code)
+    #
+    # radd_count = radd_stats.count()
+    # radd_count["alert_dates"] = (radd.dims, radd.values, radd.attrs,radd.encoding)
+    #
+    # radd_count['dates'] =  datetime.strptime(radd_cube.alert_date, '%y%j')
 
 
     path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'#asf-sbas-pairs_24d_35m_Jun20_Dec22.csv'
@@ -291,19 +298,19 @@ if __name__ == '__main__':
 
 
 
-    fig, ax = plt.subplots(5, 2, figsize=(21, 7))
+    fig, ax = plt.subplots(5, 2, figsize=(21, 7)) #IMPLEMENT SHARX AND SHAREY OPTIONS!!
     # plt.suptitle('combined groundtruth 47:73')
     a = 0
     for i in range(5):#len(coh_mean_df.columns)%2:
         for j in range(2):
             # plt.subplot(4,4,i+1)
             try:
-                ax[i,j].plot(cube.dates, convolve(coh_VV_mean_df[a],Box1DKernel(5)), label=coh_VV_mean_df.name)
-                ax[i,j].hist(cube.dates, radd_cube.where(np.unique(radd_cube.code)[a]).alert_date[1], label=coh_VV_mean_df.name)
-
-                ax[i,j].plot(cube.dates, convolve(bsc_VV_mean_df[a],Box1DKernel(5)),label=bsc_VV_mean_df.name)#, label=coh_mean_df.columns)
-                ax[i,j].plot(cube.dates, convolve(bsc_VH_mean_df[a],Box1DKernel(5)),label=bsc_VH_mean_df.name)#, label=coh_mean_df.columns)
-                ax[i,j].plot(cube.dates, convolve(coh_VH_mean_df[a],Box1DKernel(5)),label=coh_VH_mean_df.name)#, label=coh_mean_df.columns)
+                ax[i,j].plot(cube.dates, coh_VV_mean_df[a],label=coh_VV_mean_df.name)#convolve(coh_VV_mean_df[a],Box1DKernel(5)), label=coh_VV_mean_df.name)   #
+                #ax[i,j].hist(cube.dates, radd_cube.where(np.unique(radd_cube.code)[a]).alert_date[1], label=coh_VV_mean_df.name)
+                ## FILL IN WITH NAN INSTEAD OF ZEROS!!!
+                ax[i,j].plot(cube.dates,   bsc_VV_mean_df[a],label=bsc_VV_mean_df.name)#convolve(bsc_VV_mean_df[a],Box1DKernel(5)),label=bsc_VV_mean_df.name)#, label=coh_mean_df.columns)
+                ax[i,j].plot(cube.dates, bsc_VH_mean_df[a],label=bsc_VH_mean_df.name)#convolve(bsc_VH_mean_df[a],Box1DKernel(5)),label=bsc_VH_mean_df.name)#, label=coh_mean_df.columns)
+                ax[i,j].plot(cube.dates,  coh_VH_mean_df[a],label=coh_VH_mean_df.name)#convolve(coh_VH_mean_df[a],Box1DKernel(5)),label=coh_VH_mean_df.name)#, label=coh_mean_df.columns)
                 ax[i, j].set_title(titles[a])
             except KeyError:
                 continue
@@ -318,8 +325,8 @@ if __name__ == '__main__':
             # combined_groundtruth_colm.plot(ax=ax[i,j], facecolor='none', edgecolor='red')#combined_groundtruth_colm['Label'] == str(titles_colm[a]
             a = a + 1
     #ax.legend()
-    ax[0,0].scatter(cube.dates,pct_clip(perp_dist_diff),label=perp_dist_diff.name)
-    ax[0,0].scatter(prcp.dates, pct_clip(prcp.prcp), label=prcp.name)
+    #ax[0,0].scatter(cube.dates,pct_clip(perp_dist_diff),label=perp_dist_diff.name)
+    #ax[0,0].scatter(prcp.dates, pct_clip(prcp.prcp), label=prcp.name)
 
     lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes][0]
     #lines, labels = [(label, []) for label in zip(*lines_labels1)][0] #sum(lol, [])
