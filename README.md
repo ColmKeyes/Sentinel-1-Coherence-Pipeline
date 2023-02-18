@@ -35,7 +35,7 @@ Pipeline creation with Snappy.
 Here, insert a few images to compare two areas for a range of coherence windows, al;so imput my precipiation and perp distance measures..
 
 <a href="">
-  <img src="Precipitation_Perp_Distance_plot.png" alt="" width="1000" height="460">
+  <img src="Precipitation_Perp_Distance_plot.png" alt="" width="560" height="200">
 </a>
 
 
