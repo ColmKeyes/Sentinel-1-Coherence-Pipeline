@@ -29,6 +29,10 @@ calculate coherence change over time and plot coherence change detection.\
 ### Pipeline creation:
 Pipeline creation with Snappy. 
 
+<a href="">
+  <img src="Deforestation_Events.jpg" alt="" width="400" height="360">
+</a>
+
 
 Here, insert a few images to compare two areas for a range of coherence windows, al;so imput my precipiation and perp distance measures..
 
