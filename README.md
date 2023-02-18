@@ -30,7 +30,7 @@ calculate coherence change over time and plot coherence change detection.\
 Pipeline creation with Snappy. 
 
 <a href="">
-  <img src="Deforestation_Events.png" alt="" width="400" height="360">
+  <img src="Disturbance_Events.png" alt="" width="400" height="360">
 </a>
 
 
