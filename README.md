@@ -29,18 +29,24 @@ calculate coherence change over time and plot coherence change detection.\
 ### Pipeline creation:
 Pipeline creation with Snappy. 
 
-<a href="">
-  <img src="Disturbance_Events.png" alt="" width="1000" height="460">
-</a>
+
 
 
 Here, insert a few images to compare two areas for a range of coherence windows, al;so imput my precipiation and perp distance measures..
+
+<a href="">
+  <img src="Precipitation_Perp_Distance_plot.png" alt="" width="1000" height="460">
+</a>
 
 
 ### Analysis:
 Time series analysis of coherece and backscatter change.
 
 For my analysis,. show the time series of the change in coherence anmd backscattter, and talk about my results so far with them..
+
+<a href="">
+  <img src="Disturbance_Events.png" alt="" width="1000" height="460">
+</a>
 
 
 To-Do:
