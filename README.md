@@ -29,25 +29,32 @@ calculate coherence change over time and plot coherence change detection.\
 ### Pipeline creation:
 Pipeline creation with Snappy. 
 
-<a href="">
-  <img src="S1A_IW_SLC__1SDV_20210501_20210513_pol_VV_coherence_window_20_jpeg.jpg" alt="" width="560" height="600">
-</a>
-<a href="">
-  <img src="S1A_IW_SLC__1SDV_20210724_20210805_pol_VV_coherence_window_20_jpeg.jpg" alt="" width="560" height="600">
-</a>
-<a href="">
-  <img src="coherence_polygons_20200611_23.png" alt="" width="560" height="600">
-</a>
 
-<a href="">
-  <img src="aquisition in borneo.PNG" alt="" width="560" height="600">
-</a>
+<p align="center">
+  <img src="aquisition in borneo.PNG" alt="Image Description" width="50%">
+</p>
+
+
+<div style="display:flex; justify-content:center; align-items:center;">
+  <div style="flex:50%; padding: 5px;">
+    <img src="S1A_IW_SLC__1SDV_20210501_20210513_pol_VV_coherence_window_20_jpeg.jpg" alt="" width="500" height="500" style="margin-right: 10px;">
+    <img src="S1A_IW_SLC__1SDV_20210724_20210805_pol_VV_coherence_window_20_jpeg.jpg" alt="" width="500" height="500">
+  </div>
+</div>
+
+
+
+<p align="center">
+  <img src="coherence_polygons_20200611_23.png" alt="Image Description" width="50%">
+</p>
+
 
 Here, insert a few images to compare two areas for a range of coherence windows, al;so imput my precipiation and perp distance measures..
 
-<a href="">
-  <img src="Precipitation_Perp_Distance_plot.png" alt="" width="560" height="200">
-</a>
+<p align="center">
+  <img src="Precipitation_Perp_Distance_plot.png" alt="Image Description" width="70%" >
+</p>
+
 
 
 ### Analysis:
