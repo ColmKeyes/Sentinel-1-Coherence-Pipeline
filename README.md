@@ -53,6 +53,7 @@ Example polygons over region:
 
 
 Here, insert a few images to compare two areas for a range of coherence windows, al;so imput my precipiation and perp distance measures..
+
 All figures below represent a percentage of the highest value for the time-period.
 
 Perpendicular distances between acquisitions and precipitation over subject area. 
@@ -77,6 +78,14 @@ I also want to add the original coherence and bsc values possibly on top of the 
 
 I want to add a comparison of 500 and 45 coherence look to show the affect of bias in my images for one area,  
 As you increase th window size sued to calculate coherence, you decrease the bias associated with calculating it. This comes from the following equation: 
+
+<div style="display:flex; justify-content:center; align-items:center;">
+  <div style="flex:50%; padding: 0px;">
+    <img src="Disturbance_Event_3_40m_no_pct_no_smooth_no_bsc.png" alt="" width="33%"  style="margin-right: 10px;">
+    <img src="Disturbance_Event_3_90m_no_pct_no_smooth_no_bsc.png" alt="" width="33%" >  
+    <img src="Disturbance_Event_3_1000m_no_pct_no_smooth_no_bsc.png" alt="" width="33%" >
+  </div>
+</div>
 
 
 To-Do:
