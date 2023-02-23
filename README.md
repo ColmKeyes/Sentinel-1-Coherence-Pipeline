@@ -88,7 +88,7 @@ All figures below represent a percentage of the highest value for the time-perio
 
 
 <p align="center">
-  <img src="Precipitation_Perp_Distance_plot.png" alt="Image Description" width="70%" >
+  <img src="Precipitation_Perp_Distance_plot2.png" alt="Image Description" width="70%" >
 </p>
 Perpendicular distances between acquisitions and precipitation over subject area. 
 Precipitation is averaged over the number of days between coherence acquisitions.
