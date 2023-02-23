@@ -67,15 +67,18 @@ def write_rasterio_stack(path, write_file, titles=None,write=True ):
         meta = src0.meta
     meta.update(count=len(os.listdir(path)))
     titles = []
+    src0.close()
+
     with rasterio.open(write_file, 'w', **meta) as dst:
         for ix, layer in enumerate(os.listdir(path), start=1):
             with rasterio.open(path + '\\' +str(layer)) as src1:
                 titles.append(str(layer)[17:25]) ## get list of image dates..
                 if write == True:
-                    dst.write_band(ix, pct_clip(src1.read(1)))
+                    dst.write_band(ix,pct_clip(src1.read(1)))
+                src1.close()
         print(f'Total Images stacked: {ix}')
         dst.close()
-        return titles
+    return titles
 
 def build_cube(tiff_stacks, shp=None ):
     cubes= []

@@ -205,10 +205,10 @@ def main(pols,
          outpath):
 
     SLC_path = r'D:\Data\SLC'
-    shapes = r'C:\Users\Lord Colm\Desktop\InSAR Thesis\Data\Primary_Disturbance-polygon.shp'
+    #shapes = r'C:\Users\Lord Colm\Desktop\InSAR Thesis\Data\Primary_Disturbance-polygon.shp'
     path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'#asf-sbas-pairs_24d_35m_Jun20_Dec22.csv'
 
-    shpfile = 'D:\Data\geometry_Polygon.shp'
+    #shpfile = 'D:\Data\geometry_Polygon.shp'
     if not os.path.exists(outpath):
         os.makedirs(outpath)
 
