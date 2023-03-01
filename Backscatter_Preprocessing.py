@@ -15,10 +15,10 @@ import Sentinel_1_SLC_Preprocessing as slc
 pols = ['VH']#,'VV'] #'VH,VV'
 iw_swath = 'IW2'
 first_burst_index = 4
-mode = 'coherence'
+mode = 'backscatter'
 last_burst_index = 7
 product_type = 'GeoTIFF'
-multilook_window_size = [[3,15]]#[2,10],[3,15]]#[10,50]]#[4,20,] [5,25],[6,30],[7,35],[8,40],[10,50]]      #[2,10],[3,15],[4,20]]
+multilook_window_size = [[10,50]]#[2,10],[3,15]]#[10,50]]#[4,20,] [5,25],[6,30],[7,35],[8,40],[10,50]]      #[2,10],[3,15],[4,20]]
 outpath = 'D:\Data\Results\Coherence_Results'
 if mode == 'backscatter':
      outpath_window = '_backscatter_multilook_window_'

@@ -164,7 +164,7 @@ def terrain_correction(source,coh_window_size):#, proj):
     parameters.put('sourceBands', band_names[0])
     parameters.put('imgResamplingMethod', 'BILINEAR_INTERPOLATION')
     parameters.put('SEMResamplingMethod', 'BILINEAR_INTERPOLATION')
-
+    parameters.put("alignToStandardGrid", True)
     #parameters.put('mapProjection', proj)       # comment this line if no need to convert to UTM/WGS84, default is WGS84
     #parameters.put('saveProjectedLocalIncidenceAngle', True)
     parameters.put('saveSelectedSourceBand', True)
@@ -190,6 +190,13 @@ def topsar_deburst(source,pols):
     parameters = HashMap()
     parameters.put('selectedPolarisations', pols)
     output = GPF.createProduct('TOPSAR-Deburst', parameters,source)
+    return output
+
+def reprojection():
+    print('\tOperator-Reprojection...')
+    parameters = HashMap()
+    parameters.put('selectedPolarisations', pols)
+    output = GPF.createProduct('TOPSAR-Deburst', parameters, source)
     return output
 
 
