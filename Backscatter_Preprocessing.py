@@ -13,12 +13,13 @@ This script processes SLC data to coherence or backscatter GeoTiffs
 import Sentinel_1_SLC_Preprocessing as slc
 
 pols = ['VH']#,'VV'] #'VH,VV'
+sentinel1_spacing = [14.04, 3.68]
 iw_swath = 'IW2'
 first_burst_index = 4
-mode = 'backscatter'
+mode = 'coherence'
 last_burst_index = 7
 product_type = 'GeoTIFF'
-multilook_window_size = [[10,50]]#[2,10],[3,15]]#[10,50]]#[4,20,] [5,25],[6,30],[7,35],[8,40],[10,50]]      #[2,10],[3,15],[4,20]]
+multilook_window_size =  [[2,8],[3,12],[4,15],[9,34],[14,53],[18,69]]  #[5,19],[6,23],[7,27],[9,34],[10,38],[14,53],[16,61],[18,69]]             ##Pixel Spacing: 14,28,42,56,70,84.24,98.28,112.32,126.36,140.4,196.56,224.64,252.72                                      #[[10,50]]#[2,10],[3,15]]#[10,50]]#[4,20,] [5,25],[6,30],[7,35],[8,40],[10,50]]      #[2,10],[3,15],[4,20]]
 outpath = 'D:\Data\Results\Coherence_Results'
 if mode == 'backscatter':
      outpath_window = '_backscatter_multilook_window_'
@@ -36,5 +37,5 @@ for iy,pols in enumerate(pols):
               speckle_filter='Lee',
               speckle_filter_size=[5,5],
               product_type=product_type,
-              outpath = outpath + '\\' + str(multilook_window_size[ix][0]*multilook_window_size[ix][1]) + 'm_window'+ '\\pol_'+str(pols) + str(outpath_window) + str(multilook_window_size[ix][0]*multilook_window_size[ix][1]))
+              outpath = outpath + '\\' + str(int(sentinel1_spacing[0]*multilook_window_size[ix][0])) + 'm_window'+ '\\pol_'+str(pols) + str(outpath_window) + str(int(sentinel1_spacing[0]*multilook_window_size[ix][0])))  #str(multilook_window_size[ix][0]*multilook_window_size[ix][1]))
 

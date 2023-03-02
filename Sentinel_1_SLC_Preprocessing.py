@@ -156,21 +156,29 @@ def speckle_filtering(source, filter, filter_size):
 def terrain_correction(source,coh_window_size):#, proj):
     print('\tTerrain correction...')
     parameters = HashMap()
+    proj = '''PROJCS["UTM Zone 4 / World Geodetic System 1984",GEOGCS["World Geodetic System 1984",DATUM["World Geodetic System 1984",SPHEROID["WGS 84", 6378137.0, 298.257223563, AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich", 0.0, AUTHORITY["EPSG","8901"]],UNIT["degree", 0.017453292519943295],AXIS["Geodetic longitude", EAST],AXIS["Geodetic latitude", NORTH]],PROJECTION["Transverse_Mercator"],PARAMETER["central_meridian", -159.0],PARAMETER["latitude_of_origin", 0.0],PARAMETER["scale_factor", 0.9996],PARAMETER["false_easting", 500000.0],PARAMETER["false_northing", 0.0],UNIT["m", 1.0],AXIS["Easting", EAST],AXIS["Northing", NORTH]]'''
+    sentinel1_spacing = [14.04,3.68]
     parameters.put('demName', 'SRTM 3Sec')
-    #parameters.put('pixelSpacingInMeter',20)
-    #parameters.put('demName', 'GETASSE30')
+    parameters.put('standardGridOriginX', 0.0)
+    parameters.put('standardGridOriginY', 0.0)
+    parameters.put('externalDEMApplyEGM', True)
+    parameters.put('externalDEMNoDataValue', 0.0)
+
+    parameters.put('nodataValueAtSea', 'True')
+    parameters.put('auxFile', 'Latest Auxiliary File')
+
     band_names = source.getBandNames()
     #band = source.getBand(band_names[0])
     parameters.put('sourceBands', band_names[0])
     parameters.put('imgResamplingMethod', 'BILINEAR_INTERPOLATION')
-    parameters.put('SEMResamplingMethod', 'BILINEAR_INTERPOLATION')
-    parameters.put("alignToStandardGrid", True)
-    #parameters.put('mapProjection', proj)       # comment this line if no need to convert to UTM/WGS84, default is WGS84
+    parameters.put('demResamplingMethod', 'BILINEAR_INTERPOLATION')
+    parameters.put("alignToStandardGrid", False)#True)
+    parameters.put('mapProjection', "AUTO:42001")       # comment this line if no need to convert to UTM/WGS84, default is WGS84
     #parameters.put('saveProjectedLocalIncidenceAngle', True)
     parameters.put('saveSelectedSourceBand', True)
 
     #while downsample == 1:                      # downsample: 1 -- need downsample to 40m, 0 -- no need to downsample
-    parameters.put('pixelSpacingInMeter',np.double(coh_window_size[0]*coh_window_size[1])) #, 45.0)
+    parameters.put('pixelSpacingInMeter',np.double(np.round(sentinel1_spacing[0]*coh_window_size[0])))            #now incorrect...  coh_window_size[0]*coh_window_size[1])) #, 45.0)
     #    break
     output = GPF.createProduct('Terrain-Correction', parameters, source)
     return output
@@ -192,12 +200,12 @@ def topsar_deburst(source,pols):
     output = GPF.createProduct('TOPSAR-Deburst', parameters,source)
     return output
 
-def reprojection():
-    print('\tOperator-Reprojection...')
-    parameters = HashMap()
-    parameters.put('selectedPolarisations', pols)
-    output = GPF.createProduct('TOPSAR-Deburst', parameters, source)
-    return output
+# def reprojection():
+#     print('\tOperator-Reprojection...')
+#     parameters = HashMap()
+#     parameters.put('selectedPolarisations', pols)
+#     output = GPF.createProduct('TOPSAR-Deburst', parameters, source)
+#     return output
 
 
 def main(pols,
@@ -221,6 +229,7 @@ def main(pols,
 
 
     folder_paths = []
+    sentinel1_spacing = [14.04,3.68]
     asf_csv = pd.read_csv(path_asf_csv)
     for ref, sec in asf_csv.iterrows():
         primary = sec['Reference']
@@ -307,7 +316,7 @@ def main(pols,
 
 
         if mode == 'coherence':
-            write_tiff_path = outpath + '\\' + primary[:25] + '_' + secondary[17:25] + '_pol_' + str(pols) + '_coherence_window_' + str(coh_window_size[0] * coh_window_size[1])
+            write_tiff_path = outpath + '\\' + primary[:25] + '_' + secondary[17:25] + '_pol_' + str(pols) + '_coherence_window_' + str(int(sentinel1_spacing[0]*coh_window_size[0]))#coh_window_size[0] * coh_window_size[1])
             if not os.path.exists(write_tiff_path + '.tif'):
                 ProductIO.writeProduct(terraincorrection, write_tiff_path, product_type)  # 'BEAM-DIMAP')
             sentinel_1_1.dispose()
@@ -317,7 +326,7 @@ def main(pols,
             del terraincorrection
 
         elif mode == "backscatter":
-            write_tiff_path = outpath + '\\' + primary[:25] + '_pol_' + str(pols) + '_backscatter_multilook_window_' + str(coh_window_size[0] * coh_window_size[1])
+            write_tiff_path = outpath + '\\' + primary[:25] + '_pol_' + str(pols) + '_backscatter_multilook_window_' + str(int(sentinel1_spacing[0]*coh_window_size[0]))
             if not os.path.exists(write_tiff_path + '.tif'):
                 ProductIO.writeProduct(terraincorrection, write_tiff_path, product_type)  # 'BEAM-DIMAP')
             sentinel_1_1.dispose()

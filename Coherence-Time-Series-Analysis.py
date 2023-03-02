@@ -62,10 +62,10 @@ from Coherence_Time_Series import CoherenceTimeSeries as cts
 if __name__ == '__main__':
 
 
-    window_size = 500
+    window_size = 42
     asf_df,  coh_path_list, full_stack_path_list = cts.paths(window_size)
 
-    shp = gpd.read_file('D:\Data\\geometries\\ordered_gcp_6_items_Point.shp')   #'D:\Data\\geometries\\combiend_polygons.shp')
+    shp = gpd.read_file('D:\Data\\geometries\\combiend_polygons.shp')#'D:\Data\\geometries\\ordered_gcp_6_items_Point.shp')   #'D:\Data\\geometries\\combiend_polygons.shp')
     shp['code'] = shp.index + 1
 
     tiff_stack=[]
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     cube['dates'] = coh_dates
 
     ### ccd animation
-    ccd_animation(rasterio.open(f'{output_path}\\{os.listdir(output_path)[1]}'))
+    #ccd_animation(rasterio.open(f'{output_path}\\{os.listdir(output_path)[0]}'))
 
     #ccd_animation(rasterio.open("D:\Data\Results\S1A_IW_SLC__1SDV_20200611_20200623_pol_VH_coherence_window_500_Stack.tif"))
 
@@ -101,9 +101,9 @@ if __name__ == '__main__':
     perp_dist_diff = np.abs(asf_df[" Reference Perpendicular Baseline (meters)"] - asf_df[" Secondary Perpendicular Baseline (meters)"])
     perp_dist_diff.name = 'Perpendicular_Distance'
 
-    coh_VV_mean_df,coh_VH_mean_df,bsc_VV_mean_df,bsc_VH_mean_df = cts.calc_zonal_stats(cube)
+    zonal_stats = cts.calc_zonal_stats(cube)
 
-    cts.single_plot(cube,coh_VV_mean_df,coh_VH_mean_df,bsc_VV_mean_df,bsc_VH_mean_df,window_size)
+    cts.single_plot(cube,window_size,zonal_stats=zonal_stats)
 
     #precipitation_plot()
 

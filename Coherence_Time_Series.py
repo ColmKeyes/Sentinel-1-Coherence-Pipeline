@@ -114,9 +114,14 @@ class CoherenceTimeSeries:
 
         titles = []
         files = [f for f in os.listdir(path) if f.endswith('.tif')]
+        titles = [f[17:25] for f in files]
+        # for f in files:
+        #     title = f[17:25]
+        #     titles.append(title)
+        # titles = []
 
         #
-        coords = [(p.x, p.y) for p in gcps.geometry]
+        #coords = [(p.x, p.y) for p in gcps.geometry]
         # gcps= GroundControlPoint(gcps)
         # transform = from_gcps(gcps)
         # crs = rasterio.crs.CRS.from_epsg(28992)
@@ -144,17 +149,17 @@ class CoherenceTimeSeries:
         src_image = rasterio.open(os.path.join(path, files[3]),"r+")
         #gcp_df = gcps
 
-        first_culprit = rasterio.open(os.path.join(path, files[40]),"r+")
-
-        # Convert the GCPs to a format that rasterio can use
-        #gcps = []
-        # for _, row in gcp_df.iterrows():
-        #     gcps.append(rasterio.control.GroundControlPoint(row["x"], row["y"], row["lon"], row["lat"], row["z"]))
-
-        # Calculate the transformation matrix and output image size
+        # first_culprit = rasterio.open(os.path.join(path, files[40]),"r+")
+        #
+        # # Convert the GCPs to a format that rasterio can use
+        # #gcps = []
+        # # for _, row in gcp_df.iterrows():
+        # #     gcps.append(rasterio.control.GroundControlPoint(row["x"], row["y"], row["lon"], row["lat"], row["z"]))
+        #
+        # # Calculate the transformation matrix and output image size
         dst_crs = src_image.crs
         dst_transform, dst_width, dst_height = calculate_default_transform(src_image.crs, dst_crs, src_image.width, src_image.height, *src_image.bounds)
-
+        #
         # Create a VRT dataset with the transformation applied
         dst_profile = src_image.profile.copy()
         dst_profile.update({
@@ -167,43 +172,86 @@ class CoherenceTimeSeries:
         })
 
 
+        # from rasterio.windows import get_data_window, transform, shape
+        # src = rasterio.open(os.path.join(path, files[39]),"r+")
+        # ##set nodata as 0
+        # src.nodata = 0
+        # src.close()
+        # ## The below HAS to be r and not r+ to be abnle to set masked data...
+        # with rasterio.open(os.path.join(path, files[39]), "r") as src:
+        #
+        #     profile = src.profile.copy()
+        #     data_window = get_data_window(src.read(masked=True))
+        #     data_transform = transform(data_window, src.transform)
+        #     profile.update(
+        #         transform=data_transform,
+        #         height=data_window.height,
+        #         width=data_window.width)
+        #
+        #     data = src.read(window=data_window)
+        if not os.path.exists(f"{write_file}"):
+            os.makedirs(f"{write_file}")
         with rasterio.open(f'{write_file}\\{path[45:]}.tif', 'w', **dst_profile) as dst:
             for i, file in enumerate(files, start=1):
-                with rasterio.open(os.path.join(path, file)) as src:
-                    dest = np.zeros(rasterio.band(src, 1).shape)
-                    if write:
-                        ## I`ve modelled this on a reporjection of current data, but I need to model it on the writing of new data... see rasterio warp...
-                        reproject(source=rasterio.band(src, 1),
-                                    destination=dest,   #rasterio.band(dst, i),
-                                    src_transform=src.transform,
-                                    src_crs=src.crs,
-                                    dst_transform=dst_transform,
-                                    dst_crs=src.crs,
-                                    resampling=Resampling.nearest)
 
-                        dst.write(dest, i) #src.read(1), i)# firstly, i dont need to write this also , reproject already wrties...
+                src=rasterio.open(os.path.join(path, file),"r+")
+                src.nodata = 0
+                src.close()
+
+                with rasterio.open(os.path.join(path, file),"r") as src:
+                    profile = src.profile.copy()
+                    data_window = get_data_window(src.read(masked=True))
+                    data_transform = transform(data_window, src.transform)
+                    profile.update(
+                        transform=data_transform,
+                        height=data_window.height,
+                        width=data_window.width)
+
+                    data = src.read(window=data_window)
                     src.close()
 
-        dest = np.zeros(rasterio.band(first_culprit, 1).shape)
-        from rasterio.windows import get_data_window
-        reproject(source=rasterio.band(first_culprit, 1),
-                  destination=dest,  # rasterio.band(dst, i),
-                  src_transform=first_culprit.transform,
-                  src_crs=first_culprit.crs,
-                  dst_transform=dst_transform,
-                  dst_crs=first_culprit.crs,
-                  resampling=Resampling.nearest)
+                if write:
+                    dst.write(data[0], i)
 
-        dest1 = np.zeros(rasterio.band(src_image, 1).shape)
-        reproject(source=rasterio.band(src_image, 1),
-                  destination=dest1,  # rasterio.band(dst, i),
-                  src_transform=src_image.transform,
-                  src_crs=src_image.crs,
-                  dst_transform=dst_transform,
-                  dst_crs=src_image.crs,
-                  resampling=Resampling.nearest)
+        return titles
 
 
+
+
+                    # dest = np.zeros(rasterio.band(src, 1).shape)
+                    # if write:
+                    #     ## I`ve modelled this on a reporjection of current data, but I need to model it on the writing of new data... see rasterio warp...
+                    #     reproject(source=rasterio.band(src, 1),
+                    #                 destination=dest,   #rasterio.band(dst, i),
+                    #                 src_transform=src.transform,
+                    #                 src_crs=src.crs,
+                    #                 dst_transform=dst_transform,
+                    #                 dst_crs=src.crs,
+                    #                 resampling=Resampling.nearest)
+                    #
+                    #     dst.write(dest, i) #src.read(1), i)# firstly, i dont need to write this also , reproject already wrties...
+                    # src.close()
+
+        # dest = np.zeros(rasterio.band(first_culprit, 1).shape)
+        # from rasterio.windows import get_data_window
+        # reproject(source=rasterio.band(first_culprit, 1),
+        #           destination=dest,  # rasterio.band(dst, i),
+        #           src_transform=first_culprit.transform,
+        #           src_crs=first_culprit.crs,
+        #           dst_transform=dst_transform,
+        #           dst_crs=first_culprit.crs,
+        #           resampling=Resampling.nearest)
+        #
+        # dest1 = np.zeros(rasterio.band(src_image, 1).shape)
+        # reproject(source=rasterio.band(src_image, 1),
+        #           destination=dest1,  # rasterio.band(dst, i),
+        #           src_transform=src_image.transform,
+        #           src_crs=src_image.crs,
+        #           dst_transform=dst_transform,
+        #           dst_crs=src_image.crs,
+        #           resampling=Resampling.nearest)
+        #
+        #
 
 
 
@@ -221,90 +269,191 @@ class CoherenceTimeSeries:
         # with rasterio.open("path/to/output/image.tif", "w", **collocated_profile) as dst:
         #     dst.write(collocated_image)
 
+        ##########
+        ## plotting windowed image...
+        ##########
+        import rasterio as rio
+
+        #
+        # plt.imshow(data[0])
+        # plt.pause(100)
+        #
+        #
+        # plt.imshow(src.read(1, masked=True))
+        # plt.pause(100)
+
+        ###################
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        with rasterio.open(os.path.join(path, files[0])) as src0:
-            meta = src0.meta
-        meta.update(count=len(files))
-
-        with rasterio.open(f'{write_file}\\{path[45:]}.tif', 'w', **meta) as dst:
-            for i, file in enumerate(files, start=1):
-                with rasterio.open(os.path.join(path, file)) as src:
-                    if write:
-                        dst.write(src.read(1), i)
-                    src.close()
-
-        print(f"Total images stacked: {i}")
-        return titles
+        #
+        # with rasterio.open(os.path.join(path, files[0])) as src0:
+        #     meta = src0.meta
+        # meta.update(count=len(files))
+        #
+        # with rasterio.open(f'{write_file}\\{path[45:]}.tif', 'w', **meta) as dst:
+        #     for i, file in enumerate(files, start=1):
+        #         with rasterio.open(os.path.join(path, file)) as src:
+        #             if write:
+        #                 dst.write(src.read(1), i)
+        #             src.close()
+        #
+        # print(f"Total images stacked: {i}")
+        # return titles
 
         ##########################################
 
-
-
-
-    def build_cube(tiff_stacks, shp=None ):
-        cubes= []
+    def build_cube(tiff_stacks, shp=None):
+        cubes = []
 
         if shp is not None:
+            shp_stacks = [rioxarray.open_rasterio(os.path.join(tiff_stacks,stack), masked=True).rio.clip(shp.geometry.values, shp.crs, from_disk=True) for stack in os.listdir(tiff_stacks)]
 
-            shp_stack_backscatter = rioxarray.open_rasterio(tiff_stacks[0], masked=True).rio.clip(
-                shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
-
-
-            shp['code'] = shp.index + 1
-
-            shp_stack = rioxarray.open_rasterio(tiff_stacks[1], masked=True).rio.clip(
-                shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
-
-            shp_stack_backscatter_VH = rioxarray.open_rasterio(tiff_stacks[2], masked=True).rio.clip(
-                shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
-
-            shp_stack_coh_VH = rioxarray.open_rasterio(tiff_stacks[3], masked=True).rio.clip(
-                shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
-
-
-            shp['code'] = shp.index + 1
-            shp_stack_backscatter_VH['code']= shp_stack_backscatter_VH.band +1
-            shp_stack_coh_VH['code']= shp_stack_coh_VH.band +1
+            shp_stack_coh_VH = shp_stacks[0]
+            shp_stack_coh_VV = shp_stacks[1] if len(shp_stacks) >= 2 else None
+            shp_stack_backscatter_VH = shp_stacks[2] if len(shp_stacks) >= 3 else None
+            shp_stack_backscatter_VV = shp_stacks[3] if len(shp_stacks) >= 4 else None
 
 
 
-            cube = make_geocube(shp,like=shp_stack ,measurements=['code'])
-            cube['coherence_VV'] = (shp_stack.dims,shp_stack.values,shp_stack.attrs,shp_stack.encoding)
-            cube["coherence_VH"] = (shp_stack_coh_VH.dims, shp_stack_coh_VH.values,shp_stack_coh_VH.attrs,shp_stack_coh_VH.encoding)
-            ## squeezing last weird dim length...
 
-            ## make cube same length as backscatter cube...:
-            shp_stack_backscatter=shp_stack_backscatter.isel(y=range(0, len(cube.y)),drop=True)#x=142)) len(cube.y)-1),drop=True)
-            shp_stack_backscatter_VH=shp_stack_backscatter_VH.isel(y=range(0, len(cube.y)),drop=True)#x=142)) len(cube.y)-1),drop=True)
+            cube = make_geocube(shp, like=shp_stack_coh_VH, measurements=["code"])
+            if shp_stack_coh_VV is not None:
+                shp_stack_coh_VV["code"] = shp_stack_coh_VV.band + 1
+                cube['coherence_VV'] = (shp_stack_coh_VV.dims, shp_stack_coh_VV.values, shp_stack_coh_VV.attrs, shp_stack_coh_VV.encoding)
 
-            cube = cube.isel(x=range(0, len(cube.x)-1),drop=True)#x=142), drop=True)#y=133 ## reduce length by 1 in x axis....
+            if shp_stack_coh_VH is not None:
+                shp_stack_coh_VH["code"] = shp_stack_coh_VH.band + 1
+                cube["coherence_VH"] = (shp_stack_coh_VH.dims, shp_stack_coh_VH.values, shp_stack_coh_VH.attrs, shp_stack_coh_VH.encoding)
 
-            cube["backscatter_VV"] = (shp_stack_backscatter.dims, shp_stack_backscatter.values,shp_stack_backscatter.attrs,shp_stack_backscatter.encoding)
-            cube["backscatter_VH"] = (shp_stack_backscatter_VH.dims, shp_stack_backscatter_VH.values,shp_stack_backscatter_VH.attrs,shp_stack_backscatter_VH.encoding)
+
+            if shp_stack_backscatter_VV is not None:
+                shp_stack_backscatter_VV["code"] = shp_stack_backscatter_VV.band + 1
+                cube["backscatter_VV"] = (shp_stack_backscatter_VV.dims, shp_stack_backscatter_VV.values, shp_stack_backscatter_VV.attrs, shp_stack_backscatter_VV.encoding)
+
+            if shp_stack_backscatter_VH is not None:
+                shp_stack_backscatter_VH["code"] = shp_stack_backscatter_VH.band + 1
+                cube["backscatter_VH"] = (shp_stack_backscatter_VH.dims, shp_stack_backscatter_VH.values, shp_stack_backscatter_VH.attrs, shp_stack_backscatter_VH.encoding)
 
         return cube
+    # def build_cube(tiff_stacks, shp=None ):
+    #     cubes = []
+    #
+    #     if shp is not None:
+    #
+    #         shp_stack_backscatter = shp_stacks[0]
+    #         shp_stack = shp_stacks[1]
+    #         shp_stack_backscatter_VH = shp_stacks[2]
+    #         shp_stack_coh_VH = shp_stacks[3]
+    #
+    #         shp['code'] = shp.index + 1
+    #         shp_stack_backscatter_VH['code'] = shp_stack_backscatter_VH.band + 1
+    #         shp_stack_coh_VH['code'] = shp_stack_coh_VH.band + 1
+    #
+    #         cube = make_geocube(shp, like=shp_stack, measurements=['code'])
+    #         cube['coherence_VV'] = (shp_stack.dims, shp_stack.values, shp_stack.attrs, shp_stack.encoding)
+    #         cube["coherence_VH"] = (shp_stack_coh_VH.dims, shp_stack_coh_VH.values, shp_stack_coh_VH.attrs, shp_stack_coh_VH.encoding)
+    #         cube["backscatter_VV"] = (shp_stack_backscatter.dims, shp_stack_backscatter.values, shp_stack_backscatter.attrs, shp_stack_backscatter.encoding)
+    #         cube["backscatter_VH"] = (shp_stack_backscatter_VH.dims, shp_stack_backscatter_VH.values, shp_stack_backscatter_VH.attrs, shp_stack_backscatter_VH.encoding)
+    #
+    #     return cube
+    #
+    #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # cubes= []
+        #
+        #
+        # if shp is not None:
+        #
+        #     shp_stacks = []
+        #     for i in range(len(tiff_stacks)):
+        #         shp_stack = rioxarray.open_rasterio(tiff_stacks[i], masked=True).rio.clip(shp.geometry.values, shp.crs, from_disk=True)
+        #         shp_stacks.append(shp_stack)
+        #
+        #     shp_stack_backscatter = shp_stacks[0]
+        #     shp_stack = shp_stacks[1]
+        #     shp_stack_backscatter_VH = shp_stacks[2]
+        #     shp_stack_coh_VH = shp_stacks[3]
+        #
+        #     shp['code'] = shp.index + 1
+        #     shp_stack_backscatter_VH['code']= shp_stack_backscatter_VH.band +1
+        #     shp_stack_coh_VH['code']= shp_stack_coh_VH.band +1
+        #
+        #
+        #     cube = make_geocube(shp,like=shp_stack ,measurements=['code'])
+        #     cube['coherence_VV'] = (shp_stack.dims,shp_stack.values,shp_stack.attrs,shp_stack.encoding)
+        #     cube["coherence_VH"] = (shp_stack_coh_VH.dims, shp_stack_coh_VH.values,shp_stack_coh_VH.attrs,shp_stack_coh_VH.encoding)
+        #
+        #     cube["backscatter_VV"] = (shp_stack_backscatter.dims, shp_stack_backscatter.values,shp_stack_backscatter.attrs,shp_stack_backscatter.encoding)
+        #     cube["backscatter_VH"] = (shp_stack_backscatter_VH.dims, shp_stack_backscatter_VH.values,shp_stack_backscatter_VH.attrs,shp_stack_backscatter_VH.encoding)
+        #
+        #
+        #
+        #
+        #     ## squeezing last weird dim length...
+        #
+        #     ## make cube same length as backscatter cube...:
+        #     shp_stack_backscatter=shp_stack_backscatter.isel(y=range(0, len(cube.y)),drop=True)#x=142)) len(cube.y)-1),drop=True)
+        #     shp_stack_backscatter_VH=shp_stack_backscatter_VH.isel(y=range(0, len(cube.y)),drop=True)#x=142)) len(cube.y)-1),drop=True)
+        #
+        #     cube = cube.isel(x=range(0, len(cube.x)-1),drop=True)#x=142), drop=True)#y=133 ## reduce length by 1 in x axis....
+
+
+            # shp_stack_backscatter = rioxarray.open_rasterio(tiff_stacks[0], masked=True).rio.clip(
+            #     shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
+            #
+            #
+            # shp['code'] = shp.index + 1
+            #
+            # shp_stack = rioxarray.open_rasterio(tiff_stacks[1], masked=True).rio.clip(
+            #     shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
+            #
+            # shp_stack_backscatter_VH = rioxarray.open_rasterio(tiff_stacks[2], masked=True).rio.clip(
+            #     shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
+            #
+            # shp_stack_coh_VH = rioxarray.open_rasterio(tiff_stacks[3], masked=True).rio.clip(
+            #     shp.geometry.values, shp.crs, from_disk=True)#.sel(band=1).drop("band")
+
+        #
+        #     shp['code'] = shp.index + 1
+        #     shp_stack_backscatter_VH['code']= shp_stack_backscatter_VH.band +1
+        #     shp_stack_coh_VH['code']= shp_stack_coh_VH.band +1
+        #
+        #
+        #
+        #     cube = make_geocube(shp,like=shp_stack ,measurements=['code'])
+        #     cube['coherence_VV'] = (shp_stack.dims,shp_stack.values,shp_stack.attrs,shp_stack.encoding)
+        #     cube["coherence_VH"] = (shp_stack_coh_VH.dims, shp_stack_coh_VH.values,shp_stack_coh_VH.attrs,shp_stack_coh_VH.encoding)
+        #     ## squeezing last weird dim length...
+        #
+        #     ## make cube same length as backscatter cube...:
+        #     shp_stack_backscatter=shp_stack_backscatter.isel(y=range(0, len(cube.y)),drop=True)#x=142)) len(cube.y)-1),drop=True)
+        #     shp_stack_backscatter_VH=shp_stack_backscatter_VH.isel(y=range(0, len(cube.y)),drop=True)#x=142)) len(cube.y)-1),drop=True)
+        #
+        #     cube = cube.isel(x=range(0, len(cube.x)-1),drop=True)#x=142), drop=True)#y=133 ## reduce length by 1 in x axis....
+        #
+        #     cube["backscatter_VV"] = (shp_stack_backscatter.dims, shp_stack_backscatter.values,shp_stack_backscatter.attrs,shp_stack_backscatter.encoding)
+        #     cube["backscatter_VH"] = (shp_stack_backscatter_VH.dims, shp_stack_backscatter_VH.values,shp_stack_backscatter_VH.attrs,shp_stack_backscatter_VH.encoding)
+        #
+        # return cube
 
     def calc_zonal_stats(cube):
         #################
@@ -316,12 +465,12 @@ class CoherenceTimeSeries:
         zonal_stats = cube.groupby(cube.code)#calc_zonal_stats(cube)
         zonal_stats = zonal_stats.mean()#.rename({"coherence": "coherence_mean"})
         #zonal_transpose = zonal_stats.unstack(level='code')
-        coh_VV_mean_df = zonal_stats.coherence_VV #zonal_transpose.coherence_mean
-        bsc_VV_mean_df = zonal_stats.backscatter_VV
-        bsc_VH_mean_df = zonal_stats.backscatter_VH
-        coh_VH_mean_df = zonal_stats.coherence_VH
+        # coh_VV_mean_df = zonal_stats.coherence_VV #zonal_transpose.coherence_mean
+        # bsc_VV_mean_df = zonal_stats.backscatter_VV
+        # bsc_VH_mean_df = zonal_stats.backscatter_VH
+        # coh_VH_mean_df = zonal_stats.coherence_VH
 
-        return coh_VV_mean_df,coh_VH_mean_df,bsc_VV_mean_df,bsc_VH_mean_df
+        return zonal_stats #coh_VV_mean_df,coh_VH_mean_df,bsc_VV_mean_df,bsc_VH_mean_df
 
         #
         # grouped_coherence_cube = cube.groupby(cube.code)  ## so this is treating it as a geopandas geodataframe...
@@ -332,23 +481,34 @@ class CoherenceTimeSeries:
         # zonal_stats = xarray.merge([grid_mean, grid_min, grid_max, grid_std]).to_dataframe()
         # #shp_with_statistics = shp.merge(zonal_stats,on='code')
 
-        return zonal_stats
+        #return zonal_stats
 
     #def stat_analysis(cube):   Next up...
 
 
-    def single_plot(cube,coh_VV_mean_df,coh_VH_mean_df,bsc_VV_mean_df,bsc_VH_mean_df,window_size):
+    def single_plot(cube,window_size,zonal_stats=None):  #coh_VV_mean_df,coh_VH_mean_df,bsc_VV_mean_df,bsc_VH_mean_df,window_size):
 
-        plt.plot(cube.dates, coh_VV_mean_df[4] )#, label=coh_VV_mean_df.name)  # ,, convolve(coh_VV_mean_df[4], Box1DKernel(5), boundary=None)
-        plt.plot(cube.dates, coh_VH_mean_df[4] )#, label=coh_VH_mean_df.name)  # , coh_VH_mean_df[a],label=coh_VH_mean_df.name)  convolve(coh_VH_mean_df[4], Box1DKernel(5), boundary=None)
-        plt.plot(cube.dates,  bsc_VV_mean_df[4])#, label=bsc_VV_mean_df.name)  # bsc_VV_mean_df[a],label=bsc_VV_mean_df.name)   convolve(bsc_VV_mean_df[4], Box1DKernel(5), boundary=None)
-        plt.plot(cube.dates, bsc_VH_mean_df[4])#, label=bsc_VH_mean_df.name)  # , bsc_VH_mean_df[a],label=bsc_VH_mean_df.name) convolve(bsc_VH_mean_df[4], Box1DKernel(5), boundary=None)
-        #plt.scatter(radd_array[f'polygon{np.unique(radd_cube.code)[4]}_dates'][7:61], pct_clip(radd_array[f'polygon{np.unique(radd_cube.code)[4]}_values'][7:61], [.2, 99.8]), label='Radd Alert Detections')
-        #plt.scatter(prcp.dates, x_filtered, label='Precipitation')
-        plt.title(f'Disturbance Event 3, {window_size*2}m Resolution')
+        for var_name in zonal_stats:
+            plt.plot(cube.dates, zonal_stats[var_name][4], label=var_name)
+
+        plt.title(f'Disturbance Event 3, {window_size * 2}m Resolution')
         plt.legend()
         plt.show()
         plt.pause(100)
+
+
+
+        #
+        # plt.plot(cube.dates, zonal_stats.coherence_VV[4] )#, label=coh_VV_mean_df.name)  # ,, convolve(coh_VV_mean_df[4], Box1DKernel(5), boundary=None)
+        # plt.plot(cube.dates, zonal_stats.backscatter_VV[4] )#, label=coh_VH_mean_df.name)  # , coh_VH_mean_df[a],label=coh_VH_mean_df.name)  convolve(coh_VH_mean_df[4], Box1DKernel(5), boundary=None)
+        # plt.plot(cube.dates,  zonal_stats.coherence_VH[4])#, label=bsc_VV_mean_df.name)  # bsc_VV_mean_df[a],label=bsc_VV_mean_df.name)   convolve(bsc_VV_mean_df[4], Box1DKernel(5), boundary=None)
+        # plt.plot(cube.dates, zonal_stats.backscatter_VH[4])#, label=bsc_VH_mean_df.name)  # , bsc_VH_mean_df[a],label=bsc_VH_mean_df.name) convolve(bsc_VH_mean_df[4], Box1DKernel(5), boundary=None)
+        # #plt.scatter(radd_array[f'polygon{np.unique(radd_cube.code)[4]}_dates'][7:61], pct_clip(radd_array[f'polygon{np.unique(radd_cube.code)[4]}_values'][7:61], [.2, 99.8]), label='Radd Alert Detections')
+        # #plt.scatter(prcp.dates, x_filtered, label='Precipitation')
+        # plt.title(f'Disturbance Event 3, {window_size*2}m Resolution')
+        # plt.legend()
+        # plt.show()
+        # plt.pause(100)
 
 
 
