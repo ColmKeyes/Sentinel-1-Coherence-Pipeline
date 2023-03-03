@@ -62,10 +62,10 @@ from Coherence_Time_Series import CoherenceTimeSeries as cts
 if __name__ == '__main__':
 
 
-    window_size = 42
-    asf_df,  coh_path_list, full_stack_path_list = cts.paths(window_size)
+    window_size = 28
+    asf_df,  coh_path_list, full_stack_path_list = cts.paths(window_size,normalised=True)
 
-    shp = gpd.read_file('D:\Data\\geometries\\combiend_polygons.shp')#'D:\Data\\geometries\\ordered_gcp_6_items_Point.shp')   #'D:\Data\\geometries\\combiend_polygons.shp')
+    shp = gpd.read_file('D:\Data\\geometries\\ordered_gcp_6_items_Point.shp')   #'D:\Data\\geometries\\combiend_polygons.shp')
     shp['code'] = shp.index + 1
 
     tiff_stack=[]
@@ -81,8 +81,11 @@ if __name__ == '__main__':
         #if not os.path.exists(output_path):
         cts.write_rasterio_stack(input_path, output_path,shp)
 
+    files = [f for f in os.listdir(coh_path_list[0]) if f.endswith('.tif')]
+    titles = [f[17:25] for f in files]
+
     ## get the titles of the images
-    titles=cts.write_rasterio_stack(coh_path_list[0], full_stack_path_list,gcps=shp, write=False) ## struggling to get this to do what it's supposed to...
+    #titles=cts.write_rasterio_stack(coh_path_list[0], full_stack_path_list,gcps=shp, write=False) ## struggling to get this to do what it's supposed to...
 
     cube = cts.build_cube(tiff_stacks=full_stack_path_list, shp =shp)
 

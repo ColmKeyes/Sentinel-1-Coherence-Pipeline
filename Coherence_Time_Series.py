@@ -63,9 +63,6 @@ class CoherenceTimeSeries:
 
     def paths(window_size, normalised=False):
 
-        #######
-        ## my paths are FUCKED
-        ######
         if not normalised:
             stacks = 'Stacks_non_normalised'
         if normalised:
@@ -146,7 +143,7 @@ class CoherenceTimeSeries:
         import geopandas as gpd
 
         # Read the source image and the GCPs
-        src_image = rasterio.open(os.path.join(path, files[3]),"r+")
+        src_image = rasterio.open(os.path.join(path, files[0]),"r+")
         #gcp_df = gcps
 
         # first_culprit = rasterio.open(os.path.join(path, files[40]),"r+")
@@ -212,98 +209,10 @@ class CoherenceTimeSeries:
 
                 if write:
                     dst.write(data[0], i)
-
-        return titles
-
+            dst.close()
 
 
 
-                    # dest = np.zeros(rasterio.band(src, 1).shape)
-                    # if write:
-                    #     ## I`ve modelled this on a reporjection of current data, but I need to model it on the writing of new data... see rasterio warp...
-                    #     reproject(source=rasterio.band(src, 1),
-                    #                 destination=dest,   #rasterio.band(dst, i),
-                    #                 src_transform=src.transform,
-                    #                 src_crs=src.crs,
-                    #                 dst_transform=dst_transform,
-                    #                 dst_crs=src.crs,
-                    #                 resampling=Resampling.nearest)
-                    #
-                    #     dst.write(dest, i) #src.read(1), i)# firstly, i dont need to write this also , reproject already wrties...
-                    # src.close()
-
-        # dest = np.zeros(rasterio.band(first_culprit, 1).shape)
-        # from rasterio.windows import get_data_window
-        # reproject(source=rasterio.band(first_culprit, 1),
-        #           destination=dest,  # rasterio.band(dst, i),
-        #           src_transform=first_culprit.transform,
-        #           src_crs=first_culprit.crs,
-        #           dst_transform=dst_transform,
-        #           dst_crs=first_culprit.crs,
-        #           resampling=Resampling.nearest)
-        #
-        # dest1 = np.zeros(rasterio.band(src_image, 1).shape)
-        # reproject(source=rasterio.band(src_image, 1),
-        #           destination=dest1,  # rasterio.band(dst, i),
-        #           src_transform=src_image.transform,
-        #           src_crs=src_image.crs,
-        #           dst_transform=dst_transform,
-        #           dst_crs=src_image.crs,
-        #           resampling=Resampling.nearest)
-        #
-        #
-
-
-
-
-
-
-
-        #
-        # with WarpedVRT(src_image, crs=dst_crs, transform=dst_transform, width=dst_width, height=dst_height, resampling=Resampling.bilinear, add_alpha=True) as vrt:
-        #     # Read the collocated image from the VRT
-        #     collocated_image = vrt.read()
-        #     collocated_profile = vrt.profile
-        #
-        # # Write the collocated image to file
-        # with rasterio.open("path/to/output/image.tif", "w", **collocated_profile) as dst:
-        #     dst.write(collocated_image)
-
-        ##########
-        ## plotting windowed image...
-        ##########
-        import rasterio as rio
-
-        #
-        # plt.imshow(data[0])
-        # plt.pause(100)
-        #
-        #
-        # plt.imshow(src.read(1, masked=True))
-        # plt.pause(100)
-
-        ###################
-
-
-
-
-
-        #
-        # with rasterio.open(os.path.join(path, files[0])) as src0:
-        #     meta = src0.meta
-        # meta.update(count=len(files))
-        #
-        # with rasterio.open(f'{write_file}\\{path[45:]}.tif', 'w', **meta) as dst:
-        #     for i, file in enumerate(files, start=1):
-        #         with rasterio.open(os.path.join(path, file)) as src:
-        #             if write:
-        #                 dst.write(src.read(1), i)
-        #             src.close()
-        #
-        # print(f"Total images stacked: {i}")
-        # return titles
-
-        ##########################################
 
     def build_cube(tiff_stacks, shp=None):
         cubes = []
@@ -489,9 +398,9 @@ class CoherenceTimeSeries:
     def single_plot(cube,window_size,zonal_stats=None):  #coh_VV_mean_df,coh_VH_mean_df,bsc_VV_mean_df,bsc_VH_mean_df,window_size):
 
         for var_name in zonal_stats:
-            plt.plot(cube.dates, zonal_stats[var_name][4], label=var_name)
+            plt.plot(cube.dates, zonal_stats[var_name][5], label=var_name)
 
-        plt.title(f'Disturbance Event 3, {window_size * 2}m Resolution')
+        plt.title(f'Disturbance Event 3, {window_size}m Resolution')
         plt.legend()
         plt.show()
         plt.pause(100)
