@@ -43,7 +43,7 @@ import pandas as pd
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
-from Coherence_Time_Series import CoherenceTimeSeries as cts
+from Coherence_Time_Series import CoherenceTimeSeries #as kalimantan
 
 # TODO: plot change in backscatter between coherence fist and second images...
 ## show a stop-gap between some of the large gaps.
@@ -62,35 +62,46 @@ from Coherence_Time_Series import CoherenceTimeSeries as cts
 if __name__ == '__main__':
 
 
-    window_size = 28
-    asf_df,  coh_path_list, full_stack_path_list = cts.paths(window_size,normalised=True)
+    window_size = 56
+    normalised = False
 
+    if not normalised:
+        stacks = 'Stacks_non_normalised'
+    if normalised:
+        stacks = 'Stacks_normalised'
+
+
+    stack_path_list = f'D:\\Data\\Results\\Stacks\\{stacks}\\{window_size}m_window'
+    results_path = f'D:\\Data\\Results\\Coherence_Results\\{window_size}m_window'
+    [os.makedirs(path, exist_ok=True) for path in [stack_path_list, results_path]]
+    coh_path_list = [os.path.join(results_path, directory) for directory in os.listdir(results_path)]
+    path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'  # asf-sbas-pairs_24d_35m_Jun20_Dec22.csv'
+    asf_df = pd.read_csv(path_asf_csv)
+    asf_df = asf_df.drop(index=61)
     shp = gpd.read_file('D:\Data\\geometries\\ordered_gcp_6_items_Point.shp')   #'D:\Data\\geometries\\combiend_polygons.shp')
     shp['code'] = shp.index + 1
 
-    tiff_stack=[]
 
-     ## I NEED TO FIX THESE!!!
-    #if not os.path.exists(f"{results_path}\\{path[45:]}.tif"):
+    kalimantan = CoherenceTimeSeries(asf_df,coh_path_list,stack_path_list,window_size,shp,normalised)
 
-    stack_paths = []
-    for i in range(len(coh_path_list)):
-        stack_paths.append((coh_path_list[i], full_stack_path_list))#[i])))
 
-    for input_path, output_path in stack_paths:
-        #if not os.path.exists(output_path):
-        cts.write_rasterio_stack(input_path, output_path,shp)
+    # for i in range(len(coh_path_list)):
+    #     stack_paths.append((coh_path_list[i], stack_path_list))#[i])))
+    #
+    # for input_path, stack_path_list in stack_paths:
+    #     if not os.path.exists(output_path):
+    kalimantan.write_rasterio_stack()
 
-    files = [f for f in os.listdir(coh_path_list[0]) if f.endswith('.tif')]
-    titles = [f[17:25] for f in files]
+    # files = [f for f in os.listdir(coh_path_list[0]) if f.endswith('.tif')]
+    # titles = [f[17:25] for f in files]
 
     ## get the titles of the images
-    #titles=cts.write_rasterio_stack(coh_path_list[0], full_stack_path_list,gcps=shp, write=False) ## struggling to get this to do what it's supposed to...
+    #titles=kalimantan.write_rasterio_stack(coh_path_list[0], full_stack_path_list,gcps=shp, write=False) ## struggling to get this to do what it's supposed to...
 
-    cube = cts.build_cube(tiff_stacks=full_stack_path_list, shp =shp)
+    cube = kalimantan.build_cube()
 
-    coh_dates = pd.to_datetime(pd.Series(titles))
-    cube['dates'] = coh_dates
+    # coh_dates = pd.to_datetime(pd.Series(titles))
+    # cube['dates'] = coh_dates
 
     ### ccd animation
     #ccd_animation(rasterio.open(f'{output_path}\\{os.listdir(output_path)[0]}'))
@@ -104,9 +115,9 @@ if __name__ == '__main__':
     perp_dist_diff = np.abs(asf_df[" Reference Perpendicular Baseline (meters)"] - asf_df[" Secondary Perpendicular Baseline (meters)"])
     perp_dist_diff.name = 'Perpendicular_Distance'
 
-    zonal_stats = cts.calc_zonal_stats(cube)
+    #zonal_stats = kalimantan.calc_zonal_stats()
 
-    cts.single_plot(cube,window_size,zonal_stats=zonal_stats)
+    kalimantan.single_plot()#zonal_stats=zonal_stats)
 
     #precipitation_plot()
 
