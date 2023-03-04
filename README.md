@@ -15,23 +15,26 @@ Here, I present a pipeline for processing Sentinel-1 SLC data to produce Xarray 
 backscatter time series. 
 -->
 
-### Contents:
-Thesis Proposal,\
-Interface to Sentinel-1 preprocessing through SNAPPY,\
-Coherence and backscatter processing from SLC & ASF SBAS Pairs,\
-Functions for Xarray data-cube production, combining polarisations and varying window sizes,\
-Coherence change detection based on Mintpy: https://github.com/insarlab/MintPy-tutorial/blob/main/applications/coherence_change_detection.ipynb
+## Contents
 
+#### Thesis Proposal: 
+Original proposal for this thesis, which outlines the goals, objectives, and methodology of the research.
 
+##### SNAPPY_interface: 
+Python module contained in src/sentinel1slc.py that provides functions that interface to the Sentinel-1 preprocessing tools provided by the SNAP software.  uses the SNAPPY interface to perform preprocessing.  
 
+#### Coherence_and_backscatter_processing: 
+bin/seninel1slc_bsc_coh_preprocessing.py contains a script for processing SLC and ASF SBAS pairs to generate coherence and backscatter data. 
 
-### Utility:
-Produce animation of tiff stack.\
-calculate coherence change over time and plot coherence change detection.\
+#### Xarray_data_cube_production: 
+src/coherence_time_series.py contains a Python class that provides functionality for combining polarisations and varying window sizes to generate Xarray data cubes from the coherence and backscatter data generated in the previous step. This class includes a range of methods for manipulating and visualising the data.
 
-### Pipeline creation:
-Pipeline creation with Snappy. 
+#### Data_analysis: 
+The bin/coherence_time_series_analysis.py script provides interface examples to the CoherenceTimeSeries class used
+to performs data analysis and to generate final data products.
 
+#### Utils: 
+This directory contains works in progress a range of utility functions. These include functions for animating a coherence stack, calculating coherence change and coherence change detection.  
 
 Methods:
 
