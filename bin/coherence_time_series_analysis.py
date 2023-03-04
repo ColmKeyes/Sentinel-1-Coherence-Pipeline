@@ -8,23 +8,56 @@ This script provides analysis of data-cubes from SLC processed coherence and bac
 @Email   : keyesco@tcd.ie
 @File    : Coherence-Time-Series-Analysis
 """
-#conda update -n base -c defaults conda
 
-
-## need to import gdal for rasterio import errors
-## for some reaason this is the rule for in line, but in console needf to import rasterio first...
 import numpy as np
 import os
 import geopandas as gpd
-
-# Import Meteostat library and dependencies
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 import pandas as pd
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
-from src.coherencetimeseries import CoherenceTimeSeries #as kalimantan
+from src.coherence_time_series import CoherenceTimeSeries
+
+if __name__ == '__main__':
+    # Set variables
+    window_size = 56
+    normalised = False
+    stacks = 'Stacks_normalised' if normalised else 'Stacks_non_normalised'
+    stack_path_list = f'D:\\Data\\Results\\Stacks\\{stacks}\\{window_size}m_window'
+    results_path = f'D:\\Data\\Results\\Coherence_Results\\{window_size}m_window'
+    coh_path_list = [os.path.join(results_path, directory) for directory in os.listdir(results_path)]
+    path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'
+    asf_df = pd.read_csv(path_asf_csv).drop(index=61)
+    shp = gpd.read_file('D:\Data\\geometries\\ordered_gcp_6_items_Point.shp')
+    shp['code'] = shp.index + 1
+
+    # Build coherence time series object
+    kalimantan = CoherenceTimeSeries(asf_df, coh_path_list, stack_path_list, window_size, shp, normalised)
+    kalimantan.write_rasterio_stack()
+    cube = kalimantan.build_cube()
+
+    # Set plot titles, based on shp file
+    titles = ['1st Disturbed Area', '2nd Disturbed Area', 'Sand & Water', 'Farmland','3rd Disturbed Area', 'Intact Forest']
+    kalimantan.multiple_plots(titles)
+
+    # kalimantan.single_plot()#zonal_stats=zonal_stats)
+
+    # perp_dist_diff = np.abs(asf_df[" Reference Perpendicular Baseline (meters)"] - asf_df[" Secondary Perpendicular Baseline (meters)"])
+    # perp_dist_diff.name = 'Perpendicular_Distance'
+    #############################
+    ## Radd alerts dont' work with single GCPs...
+    #############################
+    # precipitation_plot()
+
+    ### ccd animation
+    #ccd_animation(rasterio.open(f'{output_path}\\{os.listdir(output_path)[0]}'))
+
+
+
+
+
 
 # TODO: plot change in backscatter between coherence fist and second images...
 ## show a stop-gap between some of the large gaps.
@@ -34,83 +67,6 @@ from src.coherencetimeseries import CoherenceTimeSeries #as kalimantan
 ## Keep consistent X & Y axis limits,
 ## for RQ1, visualise how different coherence window sizes show the problem of overstimation at low number of looks :D
 ## for RQ2, we then want to deep dive into the disturbance events themselves, and their temporal coherence and backscatter characteristics
-
-################################
-##CODES:
-## 5=Urban,6=Farmland,7=3rd_Compact, 3=2nd_Compact, 4=1stCompact, 10=Intact_Forest
-################################
-
-if __name__ == '__main__':
-
-
-    window_size = 56
-    normalised = False
-
-    if not normalised:
-        stacks = 'Stacks_non_normalised'
-    if normalised:
-        stacks = 'Stacks_normalised'
-
-
-    stack_path_list = f'D:\\Data\\Results\\Stacks\\{stacks}\\{window_size}m_window'
-    results_path = f'D:\\Data\\Results\\Coherence_Results\\{window_size}m_window'
-    [os.makedirs(path, exist_ok=True) for path in [stack_path_list, results_path]]
-    coh_path_list = [os.path.join(results_path, directory) for directory in os.listdir(results_path)]
-    path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'  # asf-sbas-pairs_24d_35m_Jun20_Dec22.csv'
-    asf_df = pd.read_csv(path_asf_csv)
-    asf_df = asf_df.drop(index=61)
-    shp = gpd.read_file('D:\Data\\geometries\\ordered_gcp_6_items_Point.shp')   #'D:\Data\\geometries\\combiend_polygons.shp')
-    shp['code'] = shp.index + 1
-
-
-    kalimantan = CoherenceTimeSeries(asf_df,coh_path_list,stack_path_list,window_size,shp,normalised)
-
-
-    # for i in range(len(coh_path_list)):
-    #     stack_paths.append((coh_path_list[i], stack_path_list))#[i])))
-    #
-    # for input_path, stack_path_list in stack_paths:
-    #     if not os.path.exists(output_path):
-    kalimantan.write_rasterio_stack()
-
-    # files = [f for f in os.listdir(coh_path_list[0]) if f.endswith('.tif')]
-    # titles = [f[17:25] for f in files]
-
-    ## get the titles of the images
-    #titles=kalimantan.write_rasterio_stack(coh_path_list[0], full_stack_path_list,gcps=shp, write=False) ## struggling to get this to do what it's supposed to...
-
-    cube = kalimantan.build_cube()
-
-    ### ccd animation
-    #ccd_animation(rasterio.open(f'{output_path}\\{os.listdir(output_path)[0]}'))
-
-    #ccd_animation(rasterio.open("D:\Data\Results\S1A_IW_SLC__1SDV_20200611_20200623_pol_VH_coherence_window_500_Stack.tif"))
-
-    #############################
-    ## Radd alerts dont' work with single GCPs...
-    #############################
-
-    perp_dist_diff = np.abs(asf_df[" Reference Perpendicular Baseline (meters)"] - asf_df[" Secondary Perpendicular Baseline (meters)"])
-    perp_dist_diff.name = 'Perpendicular_Distance'
-
-    #zonal_stats = kalimantan.calc_zonal_stats()
-
-    #kalimantan.single_plot()#zonal_stats=zonal_stats)
-
-    #precipitation_plot()
-
-    titles = ['1st Disturbed Area', '2nd Disturbed Area', 'Sand & Water', 'Farmland','3rd Disturbed Area', 'Intact Forest'] #'Intact Forest','Farmland','Urban', '1st_Compact Event', '2nd_Compact Event' ,'3rd_Compact Event']
-
-    kalimantan.multiple_plots(titles)
-
-
-
-
-
-
-
-
-
 
 
 

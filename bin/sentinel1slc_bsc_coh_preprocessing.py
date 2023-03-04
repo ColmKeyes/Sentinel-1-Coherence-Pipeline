@@ -8,33 +8,44 @@ This script processes SLC data to coherence or backscatter GeoTiffs
 @Email   : keyesco@tcd.ie
 @File    : Backscatter_Preprocessing
 """
-
+"""
+`sentinel1_spacing` represents the pixel spacing of the SLC data.
+The window sizes and corresponding pixel spacing values are as follows:
+[5,19] (28.08 m), [6,23] (33.72 m), [7,27] (39.36 m), [9,34] (50.76 m),
+[10,38] (56.4 m), [14,53] (78.12 m), [16,61] (90.96 m), [18,69] (103.8 m)
+window size * sentinel1_spacing = pixel spacing
+"""
 from src import sentinel1slc as slc
 
-pols = ['VH']#,'VV'] #'VH,VV'
+# Define input parameters
+pols = ['VH']  # 'VH,VV'
 sentinel1_spacing = [14.04, 3.68]
 iw_swath = 'IW2'
 first_burst_index = 4
-mode = 'coherence' # 'backscatter'
+mode = 'coherence'  # 'backscatter'
 last_burst_index = 7
 product_type = 'GeoTIFF'
-multilook_window_size =  [[2,8],[3,12],[4,15],[9,34],[14,53],[18,69]]  #[5,19],[6,23],[7,27],[9,34],[10,38],[14,53],[16,61],[18,69]]             ##Pixel Spacing: 14,28,42,56,70,84.24,98.28,112.32,126.36,140.4,196.56,224.64,252.72                                      #[[10,50]]#[2,10],[3,15]]#[10,50]]#[4,20,] [5,25],[6,30],[7,35],[8,40],[10,50]]      #[2,10],[3,15],[4,20]]
+window_size = [[2, 8], [3, 12], [4, 15], [9, 34], [14, 53], [18, 69]]
+
+# Define output path
 outpath = 'D:\Data\Results\Coherence_Results'
 if mode == 'backscatter':
-     outpath_window = '_backscatter_multilook_window_'
+    outpath_window = '_backscatter_multilook_window_'
 elif mode == 'coherence':
-     outpath_window = '_coherence_window_'
+    outpath_window = '_coherence_window_'
 
-for iy,pols in enumerate(pols):
-     for ix, i in enumerate(multilook_window_size):
-         slc.main(pols,
-              iw_swath,
-              first_burst_index,
-              last_burst_index,
-              multilook_window_size[ix],
-              mode=mode,
-              speckle_filter='Lee',
-              speckle_filter_size=[5,5],
-              product_type=product_type,
-              outpath = outpath + '\\' + str(int(sentinel1_spacing[0]*multilook_window_size[ix][0])) + 'm_window'+ '\\pol_'+str(pols) + str(outpath_window) + str(int(sentinel1_spacing[0]*multilook_window_size[ix][0])))  #str(multilook_window_size[ix][0]*multilook_window_size[ix][1]))
-
+# Loop over polarizations and window sizes
+for iy, pols in enumerate(pols):
+    for ix, i in enumerate(window_size):
+        slc.main(pols,
+                 iw_swath,
+                 first_burst_index,
+                 last_burst_index,
+                 window_size[ix],
+                 mode=mode,
+                 speckle_filter='Lee',
+                 speckle_filter_size=[5, 5],
+                 product_type=product_type,
+                 outpath=outpath + '\\' + str(int(sentinel1_spacing[0] * window_size[ix][0])) + 'm_window'
+                         + '\\pol_' + str(pols) + str(outpath_window)
+                         + str(int(sentinel1_spacing[0] * window_size[ix][0])))
