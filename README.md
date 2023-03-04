@@ -34,7 +34,7 @@ The bin/coherence_time_series_analysis.py script provides interface examples to 
 to performs data analysis and to generate final data products.
 
 #### Utils: 
-This directory contains works in progress a range of utility functions. These include functions for animating a coherence stack, calculating coherence change and coherence change detection.  
+This directory contains works in progress and a range of utility functions. These include functions for animating a coherence stack, calculating coherence change and coherence change detection.  
 
 ## Introduction:
 # Study Area:
