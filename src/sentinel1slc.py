@@ -12,27 +12,19 @@ This script provides interface to Sentinel-1 preprocessing through SNAP's Graph 
 ###########
 ## Example code:
 ## https://github.com/wajuqi/Sentinel-1-preprocessing-using-Snappy
-###########
-
 ## Snappy requires python version 3.6 or below.
+###########
 
 import datetime
 import time
 from snappy import ProductIO
 from snappy import HashMap
-from snappy import WKTReader
-## Garbage collection to release memory of objects no longer in use.
+## Garbage collection to release memory
 import os, gc
 from snappy import GPF
-import shapefile
-# import pygeoif
-# import jpy
-import zipfile
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
-
 
 ##############
 ## steps needed are:
@@ -44,27 +36,6 @@ import pandas as pd
 ## Terrain-Correction
 ## Write
 ##############
-
-def plotBand(product, band, vmin, vmax):
-    band = product.getBand(band)
-    w = band.getRasterWidth()
-    h = band.getRasterHeight()
-    print(w, h)
-    band_data = np.zeros(w * h, np.float32)
-    band.readPixels(0, 0, w, h, band_data)
-    band_data.shape = h, w
-    width = 12
-    height = 12
-    plt.figure(figsize=(width, height))
-    imgplot = plt.imshow(band_data, cmap=plt.cm.binary, vmin=vmin, vmax=vmax)
-    return imgplot
-
-
-# band_names = subset.getBandNames()
-# band = subset.getBand(band_names[0])
-
-# plotBand(subset,'coh_IW2_VV_02Mar2021_18Feb2021',0,1)
-# plotBand(backgeocoding,'i_IW2_VV_mst_02Mar2021',0,1000)
 
 
 def topsar_split(source, pols, iw_swath, first_burst_index, last_burst_index):
@@ -81,7 +52,6 @@ def topsar_split(source, pols, iw_swath, first_burst_index, last_burst_index):
 def apply_orbit_file(source):
     print('\tApply orbit file...')
     parameters = HashMap()
-    # parameters.put('Apply-Orbit-File', True)
     parameters.put('orbitType', 'Sentinel Precise (Auto Download)')
     parameters.put('polyDegree', '3')
     parameters.put('continueOnFail', 'false')
@@ -96,12 +66,12 @@ def back_geocoding(sources):
     parameters.put('demName', 'SRTM 3Sec')
     parameters.put('externalDEMNoDataValue', 0.0)
     print(sources[0].getBand(sources[0].getBandNames()[0]))
-    parameters.put('demResamplingMethod', 'BILINEAR_INTERPOLATION')  ## Perhaps give as a param...
+    parameters.put('demResamplingMethod', 'BILINEAR_INTERPOLATION')
     parameters.put('maskOutAreaWithoutElevation', 'false')
     parameters.put('outputRangeAzimuthOffset', 'false')
     parameters.put('outputDerampDemodPhase', 'false')
     parameters.put('disableReramp', 'false')
-    output = GPF.createProduct('Back-Geocoding', parameters, sources)  ##  I think I just need to change source here to an array of products, one from each apply orbit file...
+    output = GPF.createProduct('Back-Geocoding', parameters, sources)
     return output
 
 
@@ -157,10 +127,9 @@ def speckle_filtering(source, filter, filter_size):
     return output
 
 
-def terrain_correction(source, coh_window_size):  # , proj):
+def terrain_correction(source, coh_window_size, sentinel1_spacing):
     print('\tTerrain correction...')
     parameters = HashMap()
-    sentinel1_spacing = [14.04, 3.68]
     parameters.put('demName', 'SRTM 3Sec')
     parameters.put('standardGridOriginX', 0.0)
     parameters.put('standardGridOriginY', 0.0)
@@ -200,12 +169,19 @@ def topsar_deburst(source, pols):
     return output
 
 
-# def reprojection():
-#     print('\tOperator-Reprojection...')
-#     parameters = HashMap()
-#     parameters.put('selectedPolarisations', pols)
-#     output = GPF.createProduct('TOPSAR-Deburst', parameters, source)
-#     return output
+def plotBand(product, band, vmin, vmax):
+    band = product.getBand(band)
+    w = band.getRasterWidth()
+    h = band.getRasterHeight()
+    print(w, h)
+    band_data = np.zeros(w * h, np.float32)
+    band.readPixels(0, 0, w, h, band_data)
+    band_data.shape = h, w
+    width = 12
+    height = 12
+    plt.figure(figsize=(width, height))
+    imgplot = plt.imshow(band_data, cmap=plt.cm.binary, vmin=vmin, vmax=vmax)
+    return imgplot
 
 
 def main(pols,
@@ -219,10 +195,8 @@ def main(pols,
          product_type,
          outpath):
     SLC_path = r'D:\Data\SLC'
-    # shapes = r'C:\Users\Lord Colm\Desktop\InSAR Thesis\Data\Primary_Disturbance-polygon.shp'
-    path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'  # asf-sbas-pairs_24d_35m_Jun20_Dec22.csv'
+    path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'
 
-    # shpfile = 'D:\Data\geometry_Polygon.shp'
     if not os.path.exists(outpath):
         os.makedirs(outpath)
 
@@ -244,7 +218,7 @@ def main(pols,
         if mode == 'coherence':
 
             sentinel_1_1 = ProductIO.readProduct(SLC_path + "\\" + primary + '.zip')
-            sentinel_1_2 = ProductIO.readProduct(SLC_path + "\\" + secondary + '.zip')  # os.listdir(path)[os.listdir(path).index(folder) + 1])
+            sentinel_1_2 = ProductIO.readProduct(SLC_path + "\\" + secondary + '.zip')
 
             width = sentinel_1_1.getSceneRasterWidth()
             print("Width: {} px".format(width))
@@ -255,8 +229,6 @@ def main(pols,
             band_names = sentinel_1_1.getBandNames()
             print("Band names: {}".format(", ".join(band_names)))
 
-            # thermalnoisereduction_1 = thermal_noise_reduction(sentinel_1_1,pols)
-            # thermalnoisereduction_2 = thermal_noise_reduction(sentinel_1_2,pols)
             topsarsplit_1 = topsar_split(sentinel_1_1, pols, iw_swath, first_burst_index, last_burst_index)
             applyorbit_1 = apply_orbit_file(topsarsplit_1)
             topsarsplit_2 = topsar_split(sentinel_1_2, pols, iw_swath, first_burst_index, last_burst_index)
@@ -264,18 +236,9 @@ def main(pols,
             backgeocoding = back_geocoding([applyorbit_1, applyorbit_2])
             coherence = coherence_(backgeocoding, coh_window_size)
             topsardeburst = topsar_deburst(coherence, pols)
-            terraincorrection = terrain_correction(topsardeburst, coh_window_size)  # ,proj)
+            terraincorrection = terrain_correction(topsardeburst, coh_window_size, sentinel1_spacing)
 
-            # del thermalnoisereduction_1
-            # del thermalnoisereduction_2
-            del applyorbit_1
-            del applyorbit_2
-            del topsarsplit_1
-            del topsarsplit_2
-            del backgeocoding
-            del coherence
-            del topsardeburst
-
+            del applyorbit_1, applyorbit_2, topsarsplit_1, topsarsplit_2, backgeocoding, coherence, topsardeburst
 
         elif mode == 'backscatter':
             sentinel_1_1 = ProductIO.readProduct(SLC_path + "\\" + primary + '.zip')
@@ -295,16 +258,10 @@ def main(pols,
             calibration = calibration_(applyorbit_1, pols)
             topsardeburst = topsar_deburst(calibration, pols)
             multilook = multi_look(topsardeburst, coh_window_size)
-            terraincorrection = terrain_correction(multilook, coh_window_size)  # ,proj)
-            # speckle = speckle_filtering(terraincorrection, speckle_filter, speckle_filter_size)
+            terraincorrection = terrain_correction(multilook, coh_window_size, sentinel1_spacing)
+            speckle = speckle_filtering(terraincorrection, speckle_filter, speckle_filter_size)
 
-            del thermalnoisereduction
-            del applyorbit_1
-            del topsarsplit_1
-            del calibration
-            del topsardeburst
-            del multilook
-            # del terraincorrection
+            del thermalnoisereduction, applyorbit_1, topsarsplit_1, calibration, topsardeburst, multilook
 
         print("Plotting...")
         # plotBand(speckle, 'coh_IW2_VV_02Mar2021_18Feb2021', 0, 1)

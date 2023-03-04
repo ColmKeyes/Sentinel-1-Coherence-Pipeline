@@ -13,8 +13,10 @@ import numpy as np
 import os
 import geopandas as gpd
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 import pandas as pd
+
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
@@ -39,49 +41,19 @@ if __name__ == '__main__':
     cube = kalimantan.build_cube()
 
     # Set plot titles, based on shp file
-    titles = ['1st Disturbed Area', '2nd Disturbed Area', 'Sand & Water', 'Farmland','3rd Disturbed Area', 'Intact Forest']
+    titles = ['1st Disturbed Area', '2nd Disturbed Area', 'Sand & Water', 'Farmland', '3rd Disturbed Area', 'Intact Forest']
     kalimantan.multiple_plots(titles)
 
-    # kalimantan.single_plot()#zonal_stats=zonal_stats)
+    # Uncomment the following for a single plot
+    # kalimantan.single_plot()
 
+    # Uncomment the following for a coherence change detection animation
+    # ccd_animation(rasterio.open(f'{output_path}\\{os.listdir(output_path)[0]}'))
+
+    # Uncomment the following for a precipitation and perpendicular distance plot
     # perp_dist_diff = np.abs(asf_df[" Reference Perpendicular Baseline (meters)"] - asf_df[" Secondary Perpendicular Baseline (meters)"])
     # perp_dist_diff.name = 'Perpendicular_Distance'
-    #############################
-    ## Radd alerts dont' work with single GCPs...
-    #############################
-    # precipitation_plot()
+    # precip_perpdist_plot()
 
-    ### ccd animation
-    #ccd_animation(rasterio.open(f'{output_path}\\{os.listdir(output_path)[0]}'))
-
-
-
-
-
-
-# TODO: plot change in backscatter between coherence fist and second images...
-## show a stop-gap between some of the large gaps.
-## Add Fill value of NAN for boxcar,
-## combine smoothed trendline and real values as scatter.
-## add nan values for large gap??
-## Keep consistent X & Y axis limits,
-## for RQ1, visualise how different coherence window sizes show the problem of overstimation at low number of looks :D
-## for RQ2, we then want to deep dive into the disturbance events themselves, and their temporal coherence and backscatter characteristics
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # Uncomment the following for the distribution of disturbance events detced by the RADD alert system
+    # kalimantan.radd_alert_plot()

@@ -11,8 +11,8 @@ This script processes SLC data to coherence or backscatter GeoTiffs
 """
 `sentinel1_spacing` represents the pixel spacing of the SLC data.
 The window sizes and corresponding pixel spacing values are as follows:
-[5,19] (28.08 m), [6,23] (33.72 m), [7,27] (39.36 m), [9,34] (50.76 m),
-[10,38] (56.4 m), [14,53] (78.12 m), [16,61] (90.96 m), [18,69] (103.8 m)
+[2,8] (28.08 m), [3,12] (42.12 m), [4,15] (56.16 m),
+[9,34] (126.36 m), [14,53] (196.56 m), [18,69] (252.72 m)
 window size * sentinel1_spacing = pixel spacing
 """
 from src import sentinel1slc as slc
