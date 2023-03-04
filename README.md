@@ -47,8 +47,8 @@ occured between February 2021 and March 2022.
 
 
 <p align="center">
-  <img src="aquisition in borneo.PNG" alt="Image Description" width="40%">
-  <img src="subject_area.PNG" alt="Image Description" width="50%">
+  <img src="images/aquisition in borneo.PNG" alt="Image Description" width="40%">
+  <img src="images/subject_area.PNG" alt="Image Description" width="50%">
 </p>
 
 
@@ -71,15 +71,15 @@ The front end of this process is contained within the file Backscatter_Preproces
 
 <div style="display:flex; justify-content:center; align-items:center;">
   <div style="flex:50%; padding: 0px;">
-    <img src="S1A_IW_SLC__1SDV_20210501_20210513_pol_VV_coherence_window_20_jpeg.jpg" alt="" width="45%"  style="margin-right: 10px;">
-    <img src="S1A_IW_SLC__1SDV_20210724_20210805_pol_VV_coherence_window_20_jpeg.jpg" alt="" width="45%" >
+    <img src="images/S1A_IW_SLC__1SDV_20210501_20210513_pol_VV_coherence_window_20_jpeg.jpg" alt="" width="45%"  style="margin-right: 10px;">
+    <img src="images/S1A_IW_SLC__1SDV_20210724_20210805_pol_VV_coherence_window_20_jpeg.jpg" alt="" width="45%" >
   </div>
 </div>
 Example 12-day InSAR coherence acquisitions, for 20210501_20210513 and 20210724_20210805 repectively. Regular coherence and backscatter aquisitions over three years are stacked into rasterio stacks before being combined into Xarray data-cubes for final analysis. 
 
 
 <p align="center">
-  <img src="coherence_polygons_20200611_23.png" alt="Image Description" width="50%">
+  <img src="images/coherence_polygons_20200611_23.png" alt="Image Description" width="50%">
 </p>
 Example coherence polygons over region.
 
@@ -88,7 +88,7 @@ All figures below represent a percentage of the highest value for the time-perio
 
 
 <p align="center">
-  <img src="Precipitation_Perp_Distance_plot2.png" alt="Image Description" width="70%" >
+  <img src="images/Precipitation_Perp_Distance_plot2.png" alt="Image Description" width="70%" >
 </p>
 Perpendicular distances between acquisitions and precipitation over subject area. 
 Precipitation is averaged over the number of days between coherence acquisitions.
@@ -113,9 +113,9 @@ $$`γ̃  = γ_{snr}\tilde{\gamma}_{sys}\tilde{\gamma}_{sp}\tilde{\gamma}_{temp}`
 
 <div style="display:flex; justify-content:center; align-items:center;">
   <div style="flex:50%; padding: 0px;">
-    <img src="Disturbance_Event_3_40m_no_pct_no_smooth_no_bsc.png" alt="" width="30%"  style="margin-right: 0px;">
-    <img src="Disturbance_Event_3_90m_no_pct_no_smooth_no_bsc.png" alt="" width="30%" >  
-    <img src="Disturbance_Event_3_1000m_no_pct_no_smooth_no_bsc.png" alt="" width="30%" >
+    <img src="images/Disturbance_Event_3_40m_no_pct_no_smooth_no_bsc.png" alt="" width="30%"  style="margin-right: 0px;">
+    <img src="images/Disturbance_Event_3_90m_no_pct_no_smooth_no_bsc.png" alt="" width="30%" >  
+    <img src="images/Disturbance_Event_3_1000m_no_pct_no_smooth_no_bsc.png" alt="" width="30%" >
   </div>
 </div>
 Coherence estimates decrease as the window size increases. This affect is introduced due to the ratio of the bias to the coherence signal.  
@@ -128,7 +128,7 @@ For my analysis,. show the time series of the change in coherence anmd backscatt
 I also want to add the original coherence and bsc values possibly on top of the results? I feel like this will be too much information for the README... Posbbly for the readme I just stick to the boxcar plots.
 
 <a href="">
-  <img src="Disturbance_Events_1000m_pixel_spacing.png" alt="" width="1000" height="460">
+  <img src="images/Disturbance_Events_1000m_pixel_spacing.png" alt="" width="1000" height="460">
 </a>
 In the plots above, we can see 3 confirmed forest disturbance events, with three reference areas with more consistent coherence and backscatter. 
 
