@@ -37,7 +37,7 @@ def calc_coherence_change(coherence_stack,
                           print_msg=False):
 
 
-    with rasterio.open('../ccd_stack.tif', 'w', **meta) as dst:
+    with rasterio.open('../images/ccd_stack.tif', 'w', **meta) as dst:
         for ix,coherence in enumerate(coherence_stack):
 
             pre_coherence = coherence_stack[ix]
