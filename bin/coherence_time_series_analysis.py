@@ -11,39 +11,20 @@ This script provides analysis of data-cubes from SLC processed coherence and bac
 #conda update -n base -c defaults conda
 
 
-import pandas as pd
 ## need to import gdal for rasterio import errors
 ## for some reaason this is the rule for in line, but in console needf to import rasterio first...
-from osgeo import gdal
-import rasterio
-import rasterio as rasta
-import rasterio.plot
 import numpy as np
 import os
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import imshow
-from matplotlib.pyplot import pause
-from CCD_animation import ccd_animation
-import rioxarray
-import rioxarray as riox
-import xarray
-import xarray as xar
 import geopandas as gpd
-from geocube.api.core import make_geocube
 
 # Import Meteostat library and dependencies
-from datetime import datetime
-import matplotlib.pyplot as plt
-from meteostat import Point, Daily
-from astropy.convolution import Box1DKernel, convolve
-from scipy.signal import savgol_filter
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 import pandas as pd
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
-from Coherence_Time_Series import CoherenceTimeSeries #as kalimantan
+from src.coherencetimeseries import CoherenceTimeSeries #as kalimantan
 
 # TODO: plot change in backscatter between coherence fist and second images...
 ## show a stop-gap between some of the large gaps.
@@ -100,9 +81,6 @@ if __name__ == '__main__':
 
     cube = kalimantan.build_cube()
 
-    # coh_dates = pd.to_datetime(pd.Series(titles))
-    # cube['dates'] = coh_dates
-
     ### ccd animation
     #ccd_animation(rasterio.open(f'{output_path}\\{os.listdir(output_path)[0]}'))
 
@@ -117,13 +95,13 @@ if __name__ == '__main__':
 
     #zonal_stats = kalimantan.calc_zonal_stats()
 
-    kalimantan.single_plot()#zonal_stats=zonal_stats)
+    #kalimantan.single_plot()#zonal_stats=zonal_stats)
 
     #precipitation_plot()
 
-    titles =  ['1st Disturbed Area', '2nd Disturbed Area', 'Sand & Water', 'Farmland','3rd Disturbed Area', 'Intact Forest'] #'Intact Forest','Farmland','Urban', '1st_Compact Event', '2nd_Compact Event' ,'3rd_Compact Event']
+    titles = ['1st Disturbed Area', '2nd Disturbed Area', 'Sand & Water', 'Farmland','3rd Disturbed Area', 'Intact Forest'] #'Intact Forest','Farmland','Urban', '1st_Compact Event', '2nd_Compact Event' ,'3rd_Compact Event']
 
-    #multiple_plots(cube,coh_VV_mean_df,coh_VH_mean_df,bsc_VV_mean_df,bsc_VH_mean_df,titles,window_size)
+    kalimantan.multiple_plots(titles)
 
 
 

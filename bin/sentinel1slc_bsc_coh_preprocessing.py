@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
- #NEED TO CHANGE THIS NAME....
 """
 This script processes SLC data to coherence or backscatter GeoTiffs
 """
@@ -10,7 +9,7 @@ This script processes SLC data to coherence or backscatter GeoTiffs
 @File    : Backscatter_Preprocessing
 """
 
-import Sentinel_1_SLC_Preprocessing as slc
+from src import sentinel1slc as slc
 
 pols = ['VH']#,'VV'] #'VH,VV'
 sentinel1_spacing = [14.04, 3.68]
