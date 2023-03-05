@@ -82,6 +82,8 @@ Example 12-day InSAR coherence acquisitions, for 20210501_20210513 and 20210724_
 <p align="center">
   <img src="images/coherence_polygons_20200611_23.png" alt="Image Description" width="50%">
 </p>
+
+
 Example coherence polygons over region.
 
 
@@ -91,6 +93,8 @@ All figures below represent a percentage of the highest value for the time-perio
 <p align="center">
   <img src="images/Precipitation_Perp_Distance_plot2.png" alt="Image Description" width="70%" >
 </p>
+
+
 Perpendicular distances between acquisitions and precipitation over subject area. 
 Precipitation is averaged over the number of days between coherence acquisitions.
 
@@ -114,9 +118,9 @@ $$`γ̃  = γ_{snr}\tilde{\gamma}_{sys}\tilde{\gamma}_{sp}\tilde{\gamma}_{temp}`
 
 <div style="display:flex; justify-content:center; align-items:center;">
   <div style="flex:50%; padding: 0px;">
-    <img src="images/Disturbance_Event_3_40m_no_pct_no_smooth_no_bsc.png" alt="" width="30%"  style="margin-right: 0px;">
-    <img src="images/Disturbance_Event_3_90m_no_pct_no_smooth_no_bsc.png" alt="" width="30%" >  
-    <img src="images/Disturbance_Event_3_1000m_no_pct_no_smooth_no_bsc.png" alt="" width="30%" >
+    <img src="images/Intact_forest_28.png" alt="" width="30%"  style="margin-right: 0px;">
+    <img src="images/Intact_forest_126.png" alt="" width="30%" >  
+    <img src="images/Intact_forest_252.png" alt="" width="30%" >
   </div>
 </div>
 Coherence estimates decrease as the window size increases. This affect is introduced due to the ratio of the bias to the coherence signal.  
