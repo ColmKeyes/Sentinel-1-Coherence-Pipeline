@@ -49,12 +49,6 @@ This study focuses on the Central Kalimantan region of Indonesia on the island o
   <img src="images/subject_area.PNG" alt="Image Description" width="50%">
 </p>
 
-
-<p align="center">
-  <img src="images/aquisition in borneo.PNG" alt="Image Description" width="40%">
-  <img src="images/subject_area.PNG" alt="Image Description" width="50%">
-</p>
-
 example acquisition over Borneo.
 
 # Methods
@@ -94,33 +88,8 @@ coherence window size - closer to an infinite look spatial average the better -
   </div>
 </div>
 
-Example 12-day InSAR coherence acquisitions, for 20210501_20210513 and 20210724_20210805 repectively. Regular coherence and backscatter aquisitions over three years are stacked into rasterio stacks before being combined into Xarray data-cubes for final analysis. 
-
-
-<p align="center">
-  <img src="images/coherence_polygons_20200611_23.png" alt="Image Description" width="50%">
-</p>
-
-
-Example coherence polygons over region.
-
-
-All figures below represent a percentage of the highest value for the time-period.
-
-
-<p align="center">
-  <img src="images/Precipitation_Perp_Distance_plot2.png" alt="Image Description" width="70%" >
-</p>
-
-
 Perpendicular distances between acquisitions and precipitation over subject area. 
 Precipitation is averaged over the number of days between coherence acquisitions.
-
-
-
-
-
-
 
 
 The concept of coherence is central to this thesis, so it's determination was thoroughly researched. 
