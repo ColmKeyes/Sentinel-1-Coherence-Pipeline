@@ -72,8 +72,9 @@ coherence window size - closer to an infinite look spatial average the better -
 
 <div style="display:flex; justify-content:center; align-items:center;">
   <div style="flex:50%; padding: 0px;">
-    <img src="images/S1A_IW_SLC__1SDV_20210501_20210513_pol_VV_coherence_window_20_jpeg.jpg" alt="" width="45%"  style="margin-right: 10px;">
-    <img src="images/S1A_IW_SLC__1SDV_20210724_20210805_pol_VV_coherence_window_20_jpeg.jpg" alt="" width="45%" >
+    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_28.PNG" alt="" width="45%"  style="margin-right: 10px;">
+    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_126.tif" alt="" width="45%" >
+    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_252.tif" alt="" width="45%" >
   </div>
 </div>
 Example 12-day InSAR coherence acquisitions, for 20210501_20210513 and 20210724_20210805 repectively. Regular coherence and backscatter aquisitions over three years are stacked into rasterio stacks before being combined into Xarray data-cubes for final analysis. 
@@ -114,6 +115,8 @@ $$γ̃ = γ e^{iΔφ} = \frac{\sum\limits_{N}E(S_1S_2^*)}{\sqrt{\sum\limits_{N}E
 As you increase th window size sued to calculate coherence, you decrease the bias associated with calculating it. This comes from the following equation: 
 
 $$`γ̃  = γ_{snr}\tilde{\gamma}_{sys}\tilde{\gamma}_{sp}\tilde{\gamma}_{temp}`$$
+
+
 
 
 <div style="display:flex; justify-content:center; align-items:center;">
