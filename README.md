@@ -39,12 +39,7 @@ This directory contains works in progress and a range of utility functions. Thes
 ## Introduction:
 # Study Area:
 
-The study area comprises of a number of SAR acquisition tiles over the Central
-Kalimantan region of Indonesia on the island of Borneo, known for its intensive
-logging activities. Using the Global Forest Watch platform this area was selected as
-it exhibits clear-cut forested areas, detected by the RADD layer of the integrated
-deforestation alert system. Particular interest is given to a number of events that
-occured between February 2021 and March 2022.
+This study focuses on the Central Kalimantan region of Indonesia on the island of Borneo, which is known for its extensive logging activities. The study area consists of a number of SAR acquisition tiles and was selected using the Global Forest Watch platform due to its clear-cut forested areas, which were detected by the RADD layer of the integrated deforestation alert system. The study examines specific events that occurred between February 2021 and March 2022, which are of particular interest.
 
 
 <p align="center">
@@ -57,16 +52,21 @@ example acquisition over Borneo.
 
 # Methods
 
-Above, I have introduced several python scripts containing functions for SLC processing.
-the file Sentinel_1_SLC_Preprocessing.py contians Java-Script operators which link into the python interface for the ESA's Sentinels Application Platform(SNAP) through the python package SNAPPY.
-Here, I created a backend interface for preprocessing backscatter and coherence images given: a folder containing SLCs, a CSV file containing coherence pairs(downloaded from ASF Vertex).
-The front end of this process is contained within the file Backscatter_Preprocessing.py. Within this file, parameters such as window size, swath and burst selection, speckle filter and preprocessing mode are selected. This front end is as short as possible to promote easy alteration when producing coherence or backscatter results.
+The methodology of this study consists of three main steps. Firstly, SAR images were pre-processed using the Sentinel-1 Toolbox and Python packages such as Snappy. The pre-processing involved steps such as co-registration, calibration and  terrain correction. Secondly, coherence images were generated from the pre-processed SAR images using the SNAP software. Finally, coherence time series were analyzed using custom Python scripts and packages such as Rasterio and Xarray. The analysis involves identifying areas of change and assessing the suitability of coherence measures for mapping forest disturbances in the study area.
 
 
 ### Analysis:
 
 ## Research Question 1: 
 # Building a Scalable Coherence Pipeline:
+
+
+
+
+Things that affect coherence estimates:
+precipetation,
+perpendicular distance, 
+coherence window size - closer to an infinite look spatial average the better - 
 
 
 
