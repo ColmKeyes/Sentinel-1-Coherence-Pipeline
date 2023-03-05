@@ -42,11 +42,18 @@ This directory contains works in progress and a range of utility functions. Thes
 This study focuses on the Central Kalimantan region of Indonesia on the island of Borneo, which is known for its extensive logging activities. The study area consists of a number of SAR acquisition tiles and was selected using the Global Forest Watch platform due to its clear-cut forested areas, which were detected by the RADD layer of the integrated deforestation alert system. The study examines specific events that occurred between February 2021 and March 2022, which are of particular interest.
 
 
+
+
 <p align="center">
   <img src="images/aquisition in borneo.PNG" alt="Image Description" width="40%">
   <img src="images/subject_area.PNG" alt="Image Description" width="50%">
 </p>
 
+
+<p align="center">
+  <img src="images/aquisition in borneo.PNG" alt="Image Description" width="40%">
+  <img src="images/subject_area.PNG" alt="Image Description" width="50%">
+</p>
 
 example acquisition over Borneo.
 
@@ -72,11 +79,21 @@ coherence window size - closer to an infinite look spatial average the better -
 
 <div style="display:flex; justify-content:center; align-items:center;">
   <div style="flex:50%; padding: 0px;">
-    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_28.PNG" alt="" width="45%"  style="margin-right: 10px;">
-    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_126.tif" alt="" width="45%" >
-    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_252.tif" alt="" width="45%" >
+    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_28.PNG" alt="" width="30%"  style="margin-right: 10px;">
+    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_126.PNG" alt="" width="30%" >
+    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_252.PNG" alt="" width="30%" >
   </div>
 </div>
+
+
+<div style="display:flex; justify-content:center; align-items:center;">
+  <div style="flex:50%; padding: 0px;">
+    <img src="images/Intact_forest_28m_time_series_plot.png" alt="" width="30%"  style="margin-right: 0px;">
+    <img src="images/Intact_forest_126m_time_series_plot.png" alt="" width="30%" >  
+    <img src="images/Intact_forest_252m_time_series_plot.png" alt="" width="30%" >
+  </div>
+</div>
+
 Example 12-day InSAR coherence acquisitions, for 20210501_20210513 and 20210724_20210805 repectively. Regular coherence and backscatter aquisitions over three years are stacked into rasterio stacks before being combined into Xarray data-cubes for final analysis. 
 
 
@@ -118,14 +135,6 @@ $$`γ̃  = γ_{snr}\tilde{\gamma}_{sys}\tilde{\gamma}_{sp}\tilde{\gamma}_{temp}`
 
 
 
-
-<div style="display:flex; justify-content:center; align-items:center;">
-  <div style="flex:50%; padding: 0px;">
-    <img src="images/Intact_forest_28.png" alt="" width="30%"  style="margin-right: 0px;">
-    <img src="images/Intact_forest_126.png" alt="" width="30%" >  
-    <img src="images/Intact_forest_252.png" alt="" width="30%" >
-  </div>
-</div>
 Coherence estimates decrease as the window size increases. This affect is introduced due to the ratio of the bias to the coherence signal.  
 
 ## Research Question 2:
@@ -135,9 +144,6 @@ Coherence estimates decrease as the window size increases. This affect is introd
 For my analysis,. show the time series of the change in coherence anmd backscattter, and talk about my results so far with them..
 I also want to add the original coherence and bsc values possibly on top of the results? I feel like this will be too much information for the README... Posbbly for the readme I just stick to the boxcar plots.
 
-<a href="">
-  <img src="images/Disturbance_Events_1000m_pixel_spacing.png" alt="" width="1000" height="460">
-</a>
 In the plots above, we can see 3 confirmed forest disturbance events, with three reference areas with more consistent coherence and backscatter. 
 
 These plots clearly show the decrease of backscatter and a significant increase in coherence when a large disturbance event occurs. 
