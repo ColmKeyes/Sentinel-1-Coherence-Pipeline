@@ -3,6 +3,13 @@ MSc Sentinel-1 Coherence Processing &amp; Analysis pipeline, using Snappy, Raste
 
 
 
+<p align="center">
+  <img src="images/Planet_Disturbance_Event.gif" alt="Image Description" width="100%">
+</p>
+
+
+
+
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 <!-- 
