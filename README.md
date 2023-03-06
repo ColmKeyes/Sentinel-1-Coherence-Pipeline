@@ -64,13 +64,23 @@ The methodology of this study consists of three main steps. Firstly, SAR images 
 
 
 
-Things that affect coherence estimates:
-precipetation,
-perpendicular distance, 
-coherence window size - closer to an infinite look spatial average the better - 
+The determination of coherence is a crucial step in the analysis of synthetic aperture radar (SAR) data for mapping forest disturbances. Coherence is a statistical measure that reflects the degree of similarity between two SAR images acquired over the same area at different times. The coherence value ranges between 0 and 1, with a higher coherence indicating a higher correlation between the two images.
 
+The calculation of coherence involves taking the complex conjugate of one image and multiplying it by the other image. This product is then averaged over a spatial averaging window to obtain the estimated coherence value. The size of the averaging window plays a crucial role in the estimation of coherence. A smaller window size provides higher spatial resolution but also results in higher noise levels and lower coherence values. On the other hand, a larger window size results in lower noise levels but lower spatial resolution.
 
+The estimation of coherence can be represented by the equation:
 
+$$γ̃ = γ e^{iΔφ} = \frac{\sum\limits_{N}E(S_1S_2^*)}{\sqrt{\sum\limits_{N}E(|S_1|^2)\sum\limits_{N}E(|S_2|^2)}}$$
+
+where $\gamma$ is the true coherence, $e^{iΔφ}$ is the phase difference between the two complex SAR images $S_1$ and $S_2$, and $E(.)$ represents the statistical expectation operator.
+
+In practice, the true coherence cannot be obtained over an infinite number of looks due to the limitations of the SAR system. Therefore, the estimation of coherence is subject to bias from a number of sources, such as speckle noise, atmospheric conditions, and terrain variations. The magnitude of this bias decreases with an increasing number of looks used in the calculation, and a trade-off exists between the number of looks and the spatial resolution of the resulting coherence image.
+
+$$`γ̃  = γ_{snr}\tilde{\gamma}_{sys}\tilde{\gamma}_{sp}\tilde{\gamma}_{temp}`$$
+
+To obtain accurate and reliable coherence values for mapping forest disturbances, it is essential to optimize the processing parameters, including the spatial averaging window size and the number of looks used in the calculation. Furthermore, it is important to consider the environmental factors that may affect coherence, such as precipitation and changes in vegetation structure. By carefully selecting the processing parameters and accounting for environmental factors, the coherence values can be maximized, resulting in more accurate and precise mapping of forest disturbances.
+
+Shown below are three coherence images obtained using different spatial averaging window sizes and pixel spacings. The images were generated using a 28m, 126m, and 252m window size, respectively. As the window size increases, the resulting coherence estimate approaches the true coherence value obtained using infinite looks. The images visually demonstrate the impact of window size on coherence estimates and the importance of selecting an appropriate window size for a given application.
 <div style="display:flex; justify-content:center; align-items:center;">
   <div style="flex:50%; padding: 0px;">
     <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_28.PNG" alt="" width="30%"  style="margin-right: 10px;">
@@ -88,16 +98,4 @@ coherence window size - closer to an infinite look spatial average the better -
   </div>
 </div>
 
-Perpendicular distances between acquisitions and precipitation over subject area. 
-Precipitation is averaged over the number of days between coherence acquisitions.
 
-
-The concept of coherence is central to this thesis, so it's determination was thoroughly researched. 
-Coherence is determined by a spatial averaging window, where the true coherence is determined over a sum of infinite looks. 
-In reality this is not possible, so the estimation of coherence contains bias from a number of sources. This bias decreases with increasing number of looks.   
-
-$$γ̃ = γ e^{iΔφ} = \frac{\sum\limits_{N}E(S_1S_2^*)}{\sqrt{\sum\limits_{N}E(|S_1|^2)\sum\limits_{N}E(|S_2|^2)}}$$
-
-As you increase th window size sued to calculate coherence, you decrease the bias associated with calculating it. This comes from the following equation: 
-
-$$`γ̃  = γ_{snr}\tilde{\gamma}_{sys}\tilde{\gamma}_{sp}\tilde{\gamma}_{temp}`$$
