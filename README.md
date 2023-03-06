@@ -101,31 +101,3 @@ $$γ̃ = γ e^{iΔφ} = \frac{\sum\limits_{N}E(S_1S_2^*)}{\sqrt{\sum\limits_{N}E
 As you increase th window size sued to calculate coherence, you decrease the bias associated with calculating it. This comes from the following equation: 
 
 $$`γ̃  = γ_{snr}\tilde{\gamma}_{sys}\tilde{\gamma}_{sp}\tilde{\gamma}_{temp}`$$
-
-
-
-Coherence estimates decrease as the window size increases. This affect is introduced due to the ratio of the bias to the coherence signal.  
-
-## Research Question 2:
-# Coherence Time-Series Analysis:
-
-
-For my analysis,. show the time series of the change in coherence anmd backscattter, and talk about my results so far with them..
-I also want to add the original coherence and bsc values possibly on top of the results? I feel like this will be too much information for the README... Posbbly for the readme I just stick to the boxcar plots.
-
-In the plots above, we can see 3 confirmed forest disturbance events, with three reference areas with more consistent coherence and backscatter. 
-
-These plots clearly show the decrease of backscatter and a significant increase in coherence when a large disturbance event occurs. 
-The number of RADD-Alert Events is defined as the ratio between the number of events of the current day and the maximum number of events of any observed day.
-Some notable events include:
-Clear detection of disturbance events in the 3 disturbed areas,
-higher sensitivity of coherence vs backscatter, (particularly observed in the 2nd disturbance event, where coherence rises from 25% to ~ 60% of its maximum value)
-Consistent signals for both Urban and Intact Forest, showing that both coherence and backscatter are stable for the observations,
-while farmland has a change in backscatter, presumably due to to reaping of the harvest, no forest disturbance events are detected.
-
-
-
-
-
-To-Do:
-some "simple" modelling...
