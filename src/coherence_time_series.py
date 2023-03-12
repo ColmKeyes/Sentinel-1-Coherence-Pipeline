@@ -111,7 +111,7 @@ class CoherenceTimeSeries:
 
                     if write:
                         if self.normalised:
-                            dst.write(self.pct_clip(data[0]), i)
+                            dst.write(self.pct_clip(data[0],[0.02,99.98]), i)
                         else:
                             dst.write(data[0], i)
                 dst.close()
@@ -121,7 +121,7 @@ class CoherenceTimeSeries:
         Method to build a cube by reading the coherence and backscatter stacks from rasterio.
         """
 
-        if self.shp:
+        if self.shp is not None:
             # Clipping the stack using the given shp geometry
             shp_stacks = [rioxarray.open_rasterio(os.path.join(self.stack_path_list, stack), masked=True).rio.clip(self.shp.geometry.values, self.shp.crs, from_disk=True) for stack
                           in os.listdir(self.stack_path_list)]
@@ -155,7 +155,7 @@ class CoherenceTimeSeries:
         coh_dates = pd.to_datetime(pd.Series(self.titles))
         self.cube['dates'] = coh_dates
 
-    def single_plot(self, plot_code=1):
+    def single_plot(self, titles,plot_code=5):
         """
         Plot the coherence time series for a single shp code in the Cube.
         """
@@ -164,11 +164,36 @@ class CoherenceTimeSeries:
 
         for i, (code, ds) in enumerate(grouped):
             if i == plot_code:  ## "Intact Forest" code: 5
-                plt.plot(ds.dates, ds.coherence_VH, label=f'Code {int(code)}')
-                plt.title(f'Disturbance Event 3, {self.window_size}m Resolution')
-                plt.legend()
+                plt.plot(ds.dates, ds.coherence_VH, label=f'{titles[i]}')
+                plt.title(f'{titles[i]}, {self.window_size}m Pixel Spacing')  #Disturbance Event {plot_code}
+                #plt.legend()
+                plt.ylim([0, 1])
+                plt.xlabel('Dates')
+                plt.ylabel("Correlation Coefficient")
                 plt.show()
                 plt.pause(100)
+
+        # Group cube by polygon code
+        # grouped = self.cube.groupby('code')
+        #
+        # for i, (code, ds) in enumerate(grouped):
+        #     if i == plot_code:  ## "Intact Forest" code: 5
+        #         plt.plot(ds.dates, ds.coherence_VH, label=f'Code {int(code)}')
+        #         plt.title(f'Disturbance Event 3, {self.window_size}m Resolution')
+        #         plt.legend()
+        #         plt.ylim([0, 1])
+        #         plt.xlabel('Dates')
+        #         plt.ylabel("Correlation Coefficient")
+        #
+        #         # Stop line plot when there is a gap greater than 12 days between points
+        #         diffs = np.diff(ds['dates'])
+        #         mask = np.concatenate(([False], diffs > np.timedelta64(12, 'D')))
+        #         for x in np.split(ds['dates'], np.where(mask)[0])[1:]:
+        #             plt.plot(x, ds.loc[x, 'coherence_VH'])
+        #             plt.plot(x[[0, -1]], ds.loc[x[[0, -1]], 'coherence_VH'], 'ko')
+        #
+        #         plt.show()
+        #         plt.pause(100)
 
     def multiple_plots(self, titles=None):
         """
@@ -190,7 +215,7 @@ class CoherenceTimeSeries:
                 ax[i].legend()
                 ax[i].set_ylim([0, 1])
                 ax[i].tick_params(axis='both', which='both', length=5, width=2)
-                ax[i].autoscale(enable=True, axis='both', tight=True)
+                #ax[i].autoscale(enable=True, axis='both', tight=True)
                 if titles:
                     ax[i].set_title(titles[i])
 
@@ -217,7 +242,7 @@ class CoherenceTimeSeries:
         clip[clip < 0] = 0
         return clip
 
-    def precip_perpdist_plot(self, perp_dist_diff, coh_mean_df):
+    def precip_perpdist_plot(self, perp_dist_diff):
         """
         plot mean precipitation data over coherence time period
         along with perpendicular distance between coherence pairs.
@@ -227,6 +252,8 @@ class CoherenceTimeSeries:
         - coh_mean_df: pd.dataframe of mean coherence values for each date
 
         """
+
+        grouped = self.cube.groupby('code')
 
         start = datetime(2021, 1, 1)
         end = datetime(2023, 1, 31)
@@ -239,12 +266,18 @@ class CoherenceTimeSeries:
         prcp['dates'] = self.cube.dates[:-1]
         prcp.name = 'Mean Precipitation'
 
-        plt.scatter(coh_mean_df.index, self.pct_clip(perp_dist_diff))
-        plt.plot(coh_mean_df.index, coh_mean_df, label=coh_mean_df.columns)
-        plt.yticks([0, 1])
-        plt.legend()
-        plt.show()
-        plt.pause(1000)
+
+        for i, (code, ds) in enumerate(grouped):
+            if i == 5:  ## "Intact Forest" code: 5
+                plt.scatter(prcp['dates'], self.pct_clip(prcp.prcp), label='Mean Precipitation')
+                plt.scatter(self.cube.dates[:-1], self.pct_clip(perp_dist_diff), label='Perpendicular Distance')
+                plt.plot(ds.dates, ds.coherence_VH, label=self.cube["coherence_VH"].name)
+                
+    #            plt.plot( self.cube.dates[:-1],  self.cube["coherence_VH"][:-1].values, label=self.cube["coherence_VH"].name)
+                plt.yticks([0, 1])
+                plt.legend()
+                plt.show()
+                plt.pause(1000)
 
     def radd_alert_plot(self):
         """

@@ -9,32 +9,31 @@ This script animates a stack of tiffs & saves to mp4
 @File    : CCD_animation
 """
 
-from osgeo import gdal
-import rasterio
-import rasterio as rasta
-from rasterio.merge import merge
-import numpy as np
+
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-
-
-
-def ccd_animation(opened_rasta_stack, savepath=None,titles=None):
+import os
+import numpy as np
+import datetime
+def ccd_animation(opened_rasta_stack,coh_path_list, savepath=None,titles=None):
 
     fig, ax = plt.subplots()
-    #plt.suptitle('')
+
+    titles = [f[17:25] for f in os.listdir(coh_path_list[0]) if f.endswith('.tif')]
     ims =[]
 
-    for i in range(len(opened_rasta_stack.read())):
-        im = ax.imshow(opened_rasta_stack.read( i +1), animated=True)
+    for i in range(len(opened_rasta_stack.read())):  #39
+        im = ax.imshow(opened_rasta_stack.read( i +1), animated=True, cmap="gray")
         if i== 0:
-            ax.imshow(opened_rasta_stack.read(i + 1))#,cmap="gray")#, vmin=0, vmax=1)
+            ax.imshow(opened_rasta_stack.read(i + 1),cmap="gray")#, vmin=0, vmax=1)
         ims.append([im])
 
-    ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,repeat_delay=1000)
+    ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True)#,repeat_delay=10000)
     ## Add title above each image..
     if titles is not None:
-        plt.suptitle(str(titles[0])+':'+str(titles[-1]))
+        plt.suptitle(f"InSAR Correlation Coefficient\n \n {datetime.datetime.strptime(titles[0], '%Y%m%d').strftime('%Y-%m-%d')} - {datetime.datetime.strptime(titles[-1], '%Y%m%d').strftime('%Y-%m-%d')}")
+
+        #plt.suptitle(f"Coherence Coefficient,  {datetime.datetime.strptime(titles[0], '%Y%m%d').strftime('%Y-%m-%d')} - {datetime.datetime.strptime(titles[-1], '%Y%m%d').strftime('%Y-%m-%d')}")#, fontsize=16)
     if savepath is not None:
         writer = animation.FFMpegWriter(
             fps=3, metadata=dict(artist='Me'), bitrate=1800)

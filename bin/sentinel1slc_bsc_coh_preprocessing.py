@@ -18,7 +18,7 @@ window size * sentinel1_spacing = pixel spacing
 from src import sentinel1slc as slc
 
 # Define input parameters
-pols = ['VH']  # 'VH,VV'
+pols = ['VV']  # 'VH,VV'
 sentinel1_spacing = [14.04, 3.68]
 iw_swath = 'IW2'
 first_burst_index = 4
