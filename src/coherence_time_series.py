@@ -22,6 +22,7 @@ from geocube.api.core import make_geocube
 from datetime import datetime
 import matplotlib.pyplot as plt
 from meteostat import Daily
+from statsmodels.tsa.seasonal import seasonal_decompose
 
 import warnings
 
@@ -164,9 +165,10 @@ class CoherenceTimeSeries:
 
         for i, (code, ds) in enumerate(grouped):
             if i == plot_code:  ## "Intact Forest" code: 5
-                plt.plot(ds.dates, ds.coherence_VH, label=f'{titles[i]}')
+                plt.plot(ds.dates, ds.coherence_VH, label=f'{titles[i]}_VH')
+                plt.plot(ds.dates, ds.coherence_VV, label=f'{titles[i]}_VV')
                 plt.title(f'{titles[i]}, {self.window_size}m Pixel Spacing')  #Disturbance Event {plot_code}
-                #plt.legend()
+                plt.legend()
                 plt.ylim([0, 1])
                 plt.xlabel('Dates')
                 plt.ylabel("Correlation Coefficient")
@@ -205,8 +207,8 @@ class CoherenceTimeSeries:
         grouped = self.cube.groupby('code')
 
         # Loop through the grouped data and plot each variable
+        fig, ax = plt.subplots(3, 2, figsize=(21, 7), sharey=True, sharex=True)
         for var in coh_bsc_vars:
-            fig, ax = plt.subplots(3, 2, figsize=(21, 7), sharey=True, sharex=True)
             ax = ax.flatten()
             for i, (code, data) in enumerate(grouped):
                 ax[i].plot(data['dates'], data[var], label=str(var))
@@ -219,11 +221,11 @@ class CoherenceTimeSeries:
                 if titles:
                     ax[i].set_title(titles[i])
 
-            fig.suptitle("Disturbance Analysis")
-            plt.tight_layout()
+                fig.suptitle("Disturbance Analysis")
+                plt.tight_layout()
 
-            plt.show()
-            pause(100)
+        plt.show()
+        pause(100)
 
     def pct_clip(self, array, pct=[2, 98]):
         """
@@ -287,10 +289,13 @@ class CoherenceTimeSeries:
         print("The `radd_alert_data` method is still under construction.")
         return
 
-        radd = rioxarray.open_rasterio("D:/Data/Radd_Alert.tif", masked=True).rio.clip(
-            self.shp.geometry.values, self.shp.crs, from_disk=True)
+        if self.shp:
+            radd = rioxarray.open_rasterio("D:/Data/Radd_Alert.tif", masked=True).rio.clip(
+                self.shp.geometry.values, self.shp.crs, from_disk=True)
 
-        radd_cube = make_geocube(self.shp, like=radd, measurements=['code'])
+            radd_cube = make_geocube(self.shp, like=radd, measurements=['code'])
+        #else:
+
         radd_cube["alert_date"] = (radd.dims, radd.values, radd.attrs, radd.encoding)
         radd_stats = radd_cube.groupby(radd_cube.code)
 
@@ -326,3 +331,87 @@ class CoherenceTimeSeries:
         # ax[i, j].scatter(radd_array[f'polygon{np.unique(radd_cube.code)[a]}_dates'][7:61] ,pct_clip(radd_array[f'polygon{np.unique(radd_cube.code)[a]}_values'][7:61],[.2,
         # 99.8]),label='Radd Alert Detections')#raddy_array.index,radd_xarray[f'polygon{np.unique(radd_cube.code)[a]}_values'],[0,100]))#f'polygon{np.unique(radd_cube.code)[
         # a]}_dates'
+
+
+    def seasonal_decomposition(self, variable, code, freq=None, model='additive'):
+        """
+        Applies seasonal decomposition to a variable in the datacube for a given polygon code.
+
+        Args:
+            variable (str): The variable to apply seasonal decomposition on (e.g., 'coherence_VH').
+            code (int): The polygon code to perform the decomposition on.
+            freq (int, optional): The frequency of the seasonal component. Defaults to None (automatic detection).
+            model (str, optional): The type of decomposition to perform ('additive' or 'multiplicative'). Defaults to 'additive'.
+
+        Returns:
+            decomposed (xr.Dataset): A dataset containing the trend, seasonal, and residual components.
+         """
+        # Get the time series for the given variable and polygon code
+        ts = self.get_time_series(variable, code)
+
+        if freq is None:
+            # Automatically detect the frequency of the seasonal component
+            freq = self.detect_seasonal_frequency(ts)
+
+        # Apply seasonal decomposition
+        decomposition = seasonal_decompose(ts, freq=freq, model=model, extrapolate_trend='freq')
+
+        # Create a new xarray Dataset with the decomposition components
+        decomposed = xr.Dataset({
+            'trend': (['time'], decomposition.trend),
+            'seasonal': (['time'], decomposition.seasonal),
+            'residual': (['time'], decomposition.resid)
+        }, coords={
+            'time': ts['time']
+        })
+
+        return decomposed
+
+    def detect_seasonal_frequency(self, time_series):
+        # Implement a function to automatically detect the seasonal frequency
+        # of the time series (e.g., using autocorrelation or periodogram)
+        # This is a placeholder for your custom implementation
+        raise NotImplementedError("Please implement a method to automatically detect the seasonal frequency")
+
+        """
+        Automatically detects the seasonal frequency of the time series using the Lomb-Scargle periodogram.
+    
+        Args:
+            time_series (xr.DataArray): The input time series.
+    
+        Returns:
+            freq (int): The detected seasonal frequency.
+        """
+        # Convert time to floating point representation (number of days since 1970-01-01)
+        time_float = time_series['time'].astype(float)
+
+        # Normalize time
+        time_norm = (time_float - time_float.min()) / (time_float.max() - time_float.min())
+
+        # Calculate the Lomb-Scargle periodogram
+        f = fftfreq(len(time_series), time_norm[1] - time_norm[0])
+        f = f[f > 0]
+        pgram = lombscargle(time_norm, time_series, f)
+
+        # Find the frequency with the highest power
+        dominant_freq = f[np.argmax(pgram)]
+
+        # Convert the dominant frequency to the corresponding period (integer number of days
+
+        # between observations)
+        dominant_period = int(round(1 / dominant_freq))
+
+        return dominant_period
+        ## Please note that this method assumes that the time series is irregularly sampled. If your time series is regularly sampled (e.g., daily, weekly, or monthly), you can use other techniques, such as the Fast Fourier Transform (FFT), to find the dominant frequency more efficiently.
+
+
+
+
+
+
+
+
+
+
+
+
