@@ -42,10 +42,10 @@ if __name__ == '__main__':
     shp = gpd.read_file('D:\Data\\geometries\\ordered_gcp_6_items_Point.shp')
     shp['code'] = shp.index + 1
     titles = ['1st Disturbed Area', '2nd Disturbed Area', 'Sand & Water', 'Farmland', '3rd Disturbed Area', 'Intact Forest']
-    mean_zonals = []
+    mean_zonals = pd.DataFrame(columns=["VV","VH"])
     plot_code = 5
 
-=
+
     for window_size in window_sizes:
 
         print(f"Processing window size: {window_size}")
@@ -70,17 +70,25 @@ if __name__ == '__main__':
 
         for i, (code, ds) in enumerate(grouped_cube):
             if i == plot_code:  ## "Intact Forest" code: 5
-                mean_zonals.append(ds.coherence_VH.mean().values)
+                mean_zonals.loc[window_size] = [ds.coherence_VV.mean().values, ds.coherence_VH.mean().values]
+                #mean_zonals["VH"].append(ds.coherence_VH.mean().values)
+                #mean_zonals["VV"].append(ds.coherence_VV.mean().values)
+    poly = np.polyfit(window_sizes, mean_zonals.VH.values.astype(float), deg=2)
+    funct = np.poly1d(poly)
+    plt.plot(window_sizes, funct(window_sizes), label='1/sqrt(N)')
 
-    plt.xlabel('Window Size (m)')
-    plt.scatter(window_sizes, mean_zonals) #label='28m')
+    plt.xlabel('Pixel Spacing (m)')
+    plt.scatter(window_sizes, mean_zonals.VH.values, label='Pol:VH')
+    plt.scatter(window_sizes, mean_zonals.VV.values, label='Pol:VV')
     plt.ylabel('Mean Coherence')
-    plt.title('Mean Coherence vs Window Size')
+    plt.title('Mean Coherence vs Pixel Spacing for Intact Forest')
     plt.ylim(0, 1)
+    plt.legend()
     plt.show()
     plt.pause(10000)
     print("done")
 
+## Avg Processing times: 300s, 420s, 600s, 1200s, 1500s
 
 
 

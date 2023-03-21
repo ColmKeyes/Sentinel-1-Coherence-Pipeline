@@ -8,7 +8,8 @@ This script animates a stack of tiffs & saves to mp4
 @Email   : keyesco@tcd.ie
 @File    : CCD_animation
 """
-
+## TODO: Add title above each image..
+##  Add scale bar to each image..
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation

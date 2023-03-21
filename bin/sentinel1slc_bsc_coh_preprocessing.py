@@ -18,7 +18,7 @@ window size * sentinel1_spacing = pixel spacing
 from src import sentinel1slc as slc
 
 # Define input parameters
-pols = ['VV',"VH"]  # 'VH,VV'
+pols = ['VH']  # 'VH,VV'
 sentinel1_spacing = [14.04, 3.68]
 iw_swath = 'IW2'
 first_burst_index = 4
@@ -49,5 +49,6 @@ for iy, pols in enumerate(pols):
                  outpath=outpath + '\\' + str(int(sentinel1_spacing[0] * window_size[ix][0])) + 'm_window'
                          + '\\pol_' + str(pols) + str(outpath_window)
                          + str(int(sentinel1_spacing[0] * window_size[ix][0])))
+
 
 

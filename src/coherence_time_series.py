@@ -23,7 +23,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from meteostat import Daily
 from statsmodels.tsa.seasonal import seasonal_decompose
-
+import re
 import warnings
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -134,6 +134,7 @@ class CoherenceTimeSeries:
         shp_stack_backscatter_vh = shp_stacks[2] if len(shp_stacks) >= 3 else None
         shp_stack_backscatter_vv = shp_stacks[3] if len(shp_stacks) >= 4 else None
 
+
         self.cube = make_geocube(self.shp, like=shp_stack_coh_vh, measurements=["code"])
 
         # Add variables to cube if corresponding data is available
@@ -175,27 +176,7 @@ class CoherenceTimeSeries:
                 plt.show()
                 plt.pause(100)
 
-        # Group cube by polygon code
-        # grouped = self.cube.groupby('code')
-        #
-        # for i, (code, ds) in enumerate(grouped):
-        #     if i == plot_code:  ## "Intact Forest" code: 5
-        #         plt.plot(ds.dates, ds.coherence_VH, label=f'Code {int(code)}')
-        #         plt.title(f'Disturbance Event 3, {self.window_size}m Resolution')
-        #         plt.legend()
-        #         plt.ylim([0, 1])
-        #         plt.xlabel('Dates')
-        #         plt.ylabel("Correlation Coefficient")
-        #
-        #         # Stop line plot when there is a gap greater than 12 days between points
-        #         diffs = np.diff(ds['dates'])
-        #         mask = np.concatenate(([False], diffs > np.timedelta64(12, 'D')))
-        #         for x in np.split(ds['dates'], np.where(mask)[0])[1:]:
-        #             plt.plot(x, ds.loc[x, 'coherence_VH'])
-        #             plt.plot(x[[0, -1]], ds.loc[x[[0, -1]], 'coherence_VH'], 'ko')
-        #
-        #         plt.show()
-        #         plt.pause(100)
+
 
     def multiple_plots(self, titles=None):
         """
@@ -333,6 +314,32 @@ class CoherenceTimeSeries:
         # a]}_dates'
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     def seasonal_decomposition(self, variable, code, freq=None, model='additive'):
         """
         Applies seasonal decomposition to a variable in the datacube for a given polygon code.
@@ -357,7 +364,7 @@ class CoherenceTimeSeries:
         decomposition = seasonal_decompose(ts, freq=freq, model=model, extrapolate_trend='freq')
 
         # Create a new xarray Dataset with the decomposition components
-        decomposed = xr.Dataset({
+        decomposed = xarray.Dataset({
             'trend': (['time'], decomposition.trend),
             'seasonal': (['time'], decomposition.seasonal),
             'residual': (['time'], decomposition.resid)

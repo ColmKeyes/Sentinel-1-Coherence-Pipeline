@@ -229,6 +229,7 @@ def main(pols,
             band_names = sentinel_1_1.getBandNames()
             print("Band names: {}".format(", ".join(band_names)))
 
+
             topsarsplit_1 = topsar_split(sentinel_1_1, pols, iw_swath, first_burst_index, last_burst_index)
             applyorbit_1 = apply_orbit_file(topsarsplit_1)
             topsarsplit_2 = topsar_split(sentinel_1_2, pols, iw_swath, first_burst_index, last_burst_index)
