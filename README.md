@@ -99,9 +99,9 @@ Shown below are three coherence images obtained using different spatial averagin
 
 <div style="display:flex; justify-content:center; align-items:center;">
   <div style="flex:50%; padding: 0px;">
-    <img src="images/Intact_forest_28m_time_series_plot.png" alt="" width="30%"  style="margin-right: 0px;">
-    <img src="images/Intact_forest_126m_time_series_plot.png" alt="" width="30%" >  
-    <img src="images/Intact_forest_252m_time_series_plot.png" alt="" width="30%" >
+    <img src="images/Intact_forest_2,8_time_series_plot.png" alt="" width="30%"  style="margin-right: 0px;">
+    <img src="images/Intact_forest_934_time_series_plot.png" alt="" width="30%" >  
+    <img src="images/Intact_forest_1869_time_series_plot.png" alt="" width="30%" >
   </div>
 </div>
 
