@@ -38,7 +38,7 @@ class CoherenceTimeSeries:
     A class for generating coherence and backscatter time series data-cube from Sentinel-1 SLC products.
     """
 
-    def __init__(self, asf_df, path, stack_path_list, window_size, shp=None, normalised=False):
+    def __init__(self, asf_df, path, stack_path_list, window_size,window, shp=None, normalised=False):
         """
         Args:
             asf_df (pandas.DataFrame): ASF catalog search results.
@@ -58,6 +58,7 @@ class CoherenceTimeSeries:
         self.stack_path_list = stack_path_list
         self.cube = None
         self.window_size = window_size
+        self.window = window
         self.normalised = normalised
         self.shp = shp
         # Get titles of files ending with '.tif' in path
@@ -129,11 +130,14 @@ class CoherenceTimeSeries:
         else:
             shp_stacks = [rioxarray.open_rasterio(os.path.join(self.stack_path_list, stack), masked=True) for stack in os.listdir(self.stack_path_list)]
 
-        shp_stack_coh_vh = shp_stacks[0]
+
+        shp_stack_coh_vh =  shp_stacks[0] #re.compile(r'VH_coherence_(.*?).tif').match(os.listdir(shp_stacks))
         shp_stack_coh_vv = shp_stacks[1] if len(shp_stacks) >= 2 else None
         shp_stack_backscatter_vh = shp_stacks[2] if len(shp_stacks) >= 3 else None
         shp_stack_backscatter_vv = shp_stacks[3] if len(shp_stacks) >= 4 else None
 
+        coh_regex = re.compile(r'coherence_(.*?).tif')
+        backscatter_regex = re.compile(r'backscatter_(.*?).tif')
 
         self.cube = make_geocube(self.shp, like=shp_stack_coh_vh, measurements=["code"])
 
@@ -168,7 +172,7 @@ class CoherenceTimeSeries:
             if i == plot_code:  ## "Intact Forest" code: 5
                 plt.plot(ds.dates, ds.coherence_VH, label=f'{titles[i]}_VH')
                 plt.plot(ds.dates, ds.coherence_VV, label=f'{titles[i]}_VV')
-                plt.title(f'{titles[i]}, {self.window_size}m Pixel Spacing')  #Disturbance Event {plot_code}
+                plt.title(f'{titles[i]}, Coherence Window: {self.window} ')  #Disturbance Event {plot_code}
                 plt.legend()
                 plt.ylim([0, 1])
                 plt.xlabel('Dates')

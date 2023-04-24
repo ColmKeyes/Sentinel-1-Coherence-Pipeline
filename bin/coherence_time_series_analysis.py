@@ -26,8 +26,9 @@ if __name__ == '__main__':
     # Set variables
     path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'
     asf_df = pd.read_csv(path_asf_csv).drop(index=61)
-    window_size = 252
-    normalised = False
+    window_size = 126#28#126#252
+    window = [9,34]#[2, 8]#[9,34]#[18, 69]
+    normalised = True
     stacks = 'Stacks_normalised' if normalised else 'Stacks_non_normalised'
     results_path = f'D:\\Data\\Results\\Coherence_Results\\{window_size}m_window' ## change this name
     coh_path_list = [os.path.join(results_path, directory) for directory in os.listdir(results_path)]
@@ -36,17 +37,17 @@ if __name__ == '__main__':
     shp['code'] = shp.index + 1
 
     # Build coherence time series object
-    kalimantan = CoherenceTimeSeries(asf_df, coh_path_list, stack_path_list, window_size, shp, normalised)
-    if not stack_path_list:
+    kalimantan = CoherenceTimeSeries(asf_df, coh_path_list, stack_path_list, window_size,window, shp, normalised)
+    if not os.listdir(stack_path_list):
         kalimantan.write_rasterio_stack()
     kalimantan.build_cube()
 
     # Set plot titles, based on shp file
     titles = ['1st Disturbed Area', '2nd Disturbed Area', 'Sand & Water', 'Farmland', '3rd Disturbed Area', 'Intact Forest']
-    kalimantan.multiple_plots(titles)
+    #kalimantan.multiple_plots(titles)
 
     # Uncomment the following for a single plot
-    #kalimantan.single_plot(titles)
+    kalimantan.single_plot(titles)
 
     # Uncomment the following for a coherence change detection animation
     #ccd_animation.ccd_animation(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[0]}'),coh_path_list)

@@ -38,6 +38,10 @@ def calc_coherence_change(coherence_stack,
 
 
     with rasterio.open('../images/ccd_stack.tif', 'w', **meta) as dst:
+    ##So I m probably going to loop through erach of my subject study polygons, get the standard deviation of each of the ares, compare the std of each oplygon to my
+    ## standardised forest only baseline example. if the difference is sufficient, label it as changed. then just mask over whatever non-foresdt areas there are so that I have them
+    ## out of the way...
+
         for ix,coherence in enumerate(coherence_stack):
 
             pre_coherence = coherence_stack[ix]
@@ -63,3 +67,6 @@ def calc_coherence_change(coherence_stack,
 
 
     return ccd, pre_coherence, post_coherence
+
+if __name__ == '__main__':
+    calc_coherence_change(kalimantan)
