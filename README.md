@@ -87,7 +87,7 @@ $$`γ̃  = γ_{snr}\tilde{\gamma}_{sys}\tilde{\gamma}_{sp}\tilde{\gamma}_{temp}`
 
 To obtain accurate and reliable coherence values for mapping forest disturbances, it is essential to optimize the processing parameters, including the spatial averaging window size and the number of looks used in the calculation. Furthermore, it is important to consider the environmental factors that may affect coherence, such as precipitation and changes in vegetation structure. By carefully selecting the processing parameters and accounting for environmental factors, the coherence values can be maximized, resulting in more accurate and precise mapping of forest disturbances.
 
-Shown below are three coherence images obtained using different spatial averaging window sizes and pixel spacings. The images were generated using a 28m, 126m, and 252m window size, respectively. As the window size increases, the resulting coherence estimate approaches the true coherence value obtained using infinite looks. The images visually demonstrate the impact of window size on coherence estimates and the importance of selecting an appropriate window size for a given application.
+Shown below are three coherence images obtained using different spatial averaging window sizes and pixel spacings. The images were generated using [2,8], [9,34], and [18,69] window sizes, respectively. As the window size increases, the resulting coherence estimate approaches the true coherence value obtained using infinite looks. The images visually demonstrate the impact of window size on coherence estimates and the importance of selecting an appropriate window size for a given application.
 <div style="display:flex; justify-content:center; align-items:center;">
   <div style="flex:50%; padding: 0px;">
     <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_28.PNG" alt="" width="30%"  style="margin-right: 10px;">
@@ -99,9 +99,9 @@ Shown below are three coherence images obtained using different spatial averagin
 
 <div style="display:flex; justify-content:center; align-items:center;">
   <div style="flex:50%; padding: 0px;">
-    <img src="images/Intact_forest_28m_time_series_plot.png" alt="" width="30%"  style="margin-right: 0px;">
-    <img src="images/Intact_forest_126m_time_series_plot.png" alt="" width="30%" >  
-    <img src="images/Intact_forest_252m_time_series_plot.png" alt="" width="30%" >
+    <img src="images/Intact_forest_2,8_time_series_plot.png" alt="" width="30%"  style="margin-right: 0px;">
+    <img src="images/Intact_forest_934_time_series_plot.png" alt="" width="30%" >  
+    <img src="images/Intact_forest_1869_time_series_plot.png" alt="" width="30%" >
   </div>
 </div>
 
