@@ -10,8 +10,11 @@ This script provides a class and methods for building data-cubes from SLC proces
 """
 
 import numpy as np
+import numpy.ma as ma
 import os
 from matplotlib.pyplot import pause
+from matplotlib.lines import Line2D
+import matplotlib.animation as animation
 import pandas as pd
 import rioxarray
 import rasterio
@@ -25,7 +28,7 @@ from meteostat import Daily
 from statsmodels.tsa.seasonal import seasonal_decompose
 import re
 import warnings
-
+import datetime
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 pd.set_option('display.max_rows', 500)
@@ -57,6 +60,7 @@ class CoherenceTimeSeries:
         self.path = path
         self.stack_path_list = stack_path_list
         self.cube = None
+        self.grouped = None
         self.window_size = window_size
         self.window = window
         self.normalised = normalised
@@ -130,14 +134,14 @@ class CoherenceTimeSeries:
         else:
             shp_stacks = [rioxarray.open_rasterio(os.path.join(self.stack_path_list, stack), masked=True) for stack in os.listdir(self.stack_path_list)]
 
-
-        shp_stack_coh_vh =  shp_stacks[0] #re.compile(r'VH_coherence_(.*?).tif').match(os.listdir(shp_stacks))
-        shp_stack_coh_vv = shp_stacks[1] if len(shp_stacks) >= 2 else None
-        shp_stack_backscatter_vh = shp_stacks[2] if len(shp_stacks) >= 3 else None
-        shp_stack_backscatter_vv = shp_stacks[3] if len(shp_stacks) >= 4 else None
-
-        coh_regex = re.compile(r'coherence_(.*?).tif')
+        coh_regex = re.compile(r'.+coherence')
         backscatter_regex = re.compile(r'backscatter_(.*?).tif')
+
+        shp_stack_backscatter_vh =  shp_stacks[0] #re.compile(r'VH_coherence_(.*?).tif').match(os.listdir(shp_stacks))
+        shp_stack_coh_vh = shp_stacks[1] if len(shp_stacks) >= 2 else None
+        shp_stack_backscatter_vv = shp_stacks[2] if len(shp_stacks) >= 3 else None
+        shp_stack_coh_vv = shp_stacks[3] if len(shp_stacks) >= 4 else None
+
 
         self.cube = make_geocube(self.shp, like=shp_stack_coh_vh, measurements=["code"])
 
@@ -161,14 +165,16 @@ class CoherenceTimeSeries:
         coh_dates = pd.to_datetime(pd.Series(self.titles))
         self.cube['dates'] = coh_dates
 
+        self.grouped = self.cube.groupby('code')
+
     def single_plot(self, titles,plot_code=5):
         """
         Plot the coherence time series for a single shp code in the Cube.
         """
         # Group cube by polygon code
-        grouped = self.cube.groupby('code')
+        #grouped = self.cube.groupby('code')
 
-        for i, (code, ds) in enumerate(grouped):
+        for i, (code, ds) in enumerate(self.grouped):
             if i == plot_code:  ## "Intact Forest" code: 5
                 plt.plot(ds.dates, ds.coherence_VH, label=f'{titles[i]}_VH')
                 plt.plot(ds.dates, ds.coherence_VV, label=f'{titles[i]}_VV')
@@ -186,17 +192,64 @@ class CoherenceTimeSeries:
         """
         Plot the coherence time series for each single polygon code in the Cube.
         """
+        event_dates = [['2020-07-01', '2021-03-01'], '2021-02-01', None, None, '2020-11-01', None]
 
-        coh_bsc_vars = [var for var in self.cube.variables if "coherence" in var or "backscatter" in var]
+        # Some not-so readable code to Convert non-None dates to numerical format
+        event_dates_num = []
+        for sublist in event_dates:
+            if isinstance(sublist, list):
+                sublist_dates = []
+                for d in sublist:
+                    try:
+                        sublist_dates.append(datetime.datetime.strptime(d, '%Y-%m-%d'))
+                    except (ValueError, TypeError):
+                        sublist_dates.append(None)
+                event_dates_num.append(sublist_dates)
+            else:
+                try:
+                    event_dates_num.append(datetime.datetime.strptime(sublist, '%Y-%m-%d'))
+                except (ValueError, TypeError):
+                    event_dates_num.append(None)
+
+        #print(event_dates_num)
+
+        #event_dates_num = [[datetime.datetime.strptime(d, '%Y-%m-%d') if d is not None else None for d in sublist] for sublist in event_dates]
+
+        #event_dates_num = [datetime.datetime.strptime(d, '%Y-%m-%d') if d is not None else None for d in event_dates]
+
+        # Define the index range of the gap
+        start_idx = np.where(self.cube.dates == np.datetime64('2021-05-01'))[0][0]
+        end_idx = np.where(self.cube.dates == np.datetime64('2021-07-24'))[0][0]
+
+        # Create a mask for the gap
+        mask = np.zeros(len(self.cube.dates), dtype=bool)
+        mask[start_idx:end_idx] = True
+
+        #mask = self.cube['dates'].isnull()
+
+        # Mask the `dates` variable and other variables along the `dim_0` dimension
+        masked_dates = ma.array(self.cube['dates'].values, mask=mask)
+        #grouped = self.cube.where(~mask).drop('dim_0').groupby('code')  #.assign_coords(dates=masked_dates)
+
+
+        # # Plot the masked data
+        # plt.plot(self.cube['dates'], masked_cube['coherence_VH'])
+        # plt.show()
+        # plt.pause(100)
+
+
+        coh_bsc_vars = [var for var in self.cube.variables if "coherence" in var]  #"backscatter" in var or
         # Group by the 'code' variable
-        grouped = self.cube.groupby('code')
+        #grouped = self.cube.groupby('code')
 
         # Loop through the grouped data and plot each variable
         fig, ax = plt.subplots(3, 2, figsize=(21, 7), sharey=True, sharex=True)
         for var in coh_bsc_vars:
             ax = ax.flatten()
-            for i, (code, data) in enumerate(grouped):
-                ax[i].plot(data['dates'], data[var], label=str(var))
+            for i, ((code, data), event_date) in enumerate(zip(self.grouped, event_dates_num)):
+                print(i)
+                #data1=data.where(~mask)
+                ax[i].plot(data['dates'][:,0].where(~mask), data.drop('dates').rolling(band=3,min_periods=2, center=True).std()[var], label=str(var))
                 ax[i].set_xlabel('Dates')
                 ax[i].set_ylabel("Correlation Coefficient" if "coherence" in var else "Backscatter (dB)")
                 ax[i].legend()
@@ -205,12 +258,205 @@ class CoherenceTimeSeries:
                 #ax[i].autoscale(enable=True, axis='both', tight=True)
                 if titles:
                     ax[i].set_title(titles[i])
+                if event_date is not None:
+                    if isinstance(event_date, list):
+                        ax[i].axvline(x=event_date[0], color='r')
+                        ax[i].axvline(x=event_date[1], color='r')
+                    else:
+                        ax[i].axvline(x=event_date, color='r')
 
-                fig.suptitle("Disturbance Analysis")
+                # if event_dates and i < len(event_dates):
+                #     event_date = event_dates[i]
+                #     # Convert event date to Matplotlib format
+                #     event_date = mdates.date2num(event_date)
+                #     ax[i].axvline(x=event_date, color='red')
+
+                fig.suptitle("Disturbance Analysis: Coherence")
                 plt.tight_layout()
 
         plt.show()
         pause(100)
+
+    def stats(self, titles=None):
+        '''
+        Plotting coherence disturbance events
+        ## grouped[5]  ## 3rd Disturbed
+        ## grouped[6]  ## Intact Forest
+        '''
+
+        event_dates = [['2020-07-01', '2021-03-01'], '2021-02-01', None, None, '2020-11-01', None]
+
+        # Some not-so readable code to Convert non-None dates to numerical format
+        event_dates_num = []
+        for sublist in event_dates:
+            if isinstance(sublist, list):
+                sublist_dates = []
+                for d in sublist:
+                    try:
+                        sublist_dates.append(datetime.datetime.strptime(d, '%Y-%m-%d'))
+                    except (ValueError, TypeError):
+                        sublist_dates.append(None)
+                event_dates_num.append(sublist_dates)
+            else:
+                try:
+                    event_dates_num.append(datetime.datetime.strptime(sublist, '%Y-%m-%d'))
+                except (ValueError, TypeError):
+                    event_dates_num.append(None)
+
+        # 3rd_disturbed - Intact_Forest,
+        # if std(3rd_disturbed) >>> std(Intact_Forest) at the same time-series point:
+        #   draw a line at this point in my graph.
+        #   then for mapping, look at this same std for every point on the map, and highlihgt that point if it is gt the std(Intact_Forest)
+        # data.drop('dates').rolling(band=3,min_periods=2, center=True).std()[var]
+        ## So, I want to know the difference betwen the disturbance and the intact forest amplitude, and see if this difference in amplitude is outside of the
+        ## standard deviation of the intact forest for the same dates, => simply showing that the event definitely occurs.
+
+        ## now is to look up 3sigma std dev methods.
+
+        coh_bsc_vars = [var for var in self.cube.variables if "coherence" in var]  # "backscatter" in var or
+
+        ##########################
+        ## Multiplot loop
+        ##########################
+        # Loop through the grouped data and plot each variable
+        fig, ax = plt.subplots(3, 2, figsize=(21, 7), sharey=True, sharex=True)
+        for var in coh_bsc_vars:
+            ax = ax.flatten()
+            for i, ((code, data), event_date) in enumerate(zip(self.grouped, event_dates_num)):
+
+                amplitude_diff = data.drop('dates').coherence_VH.values - self.grouped[6].drop('dates').coherence_VH.values
+                std_diff = np.abs(np.abs(amplitude_diff) / (np.abs(self.grouped[6].drop('dates').rolling(band=3, min_periods=2, center=True).std().coherence_VH.values) * 3)) ## 3 Sigma
+
+
+                # Find the indices where std_diff is greater than 1
+                significant_indices = np.where(std_diff > 5)
+
+                # Extract the corresponding dates for the significant indices
+                try:
+                    significant_dates = data['dates'][significant_indices].values[:, 0]
+                except IndexError:
+                    significant_dates = []
+                #ax[i].plot(data['dates'][:, 0].where(~mask), data.drop('dates').rolling(band=3, min_periods=2, center=True).std()[var], label=str(var))
+                ax[i].plot(data['dates'][:, 0], std_diff, label=str(var))
+                ax[i].set_xlabel('Dates')
+                ax[i].set_ylabel("STD from Intact Forest")
+                ax[i].legend()
+                #ax[i].set_ylim([0, 1])
+                ax[i].tick_params(axis='both', which='both', length=5, width=2)
+                # ax[i].autoscale(enable=True, axis='both', tight=True)
+                if titles:
+                    ax[i].set_title(titles[i])
+                if event_date is not None:
+                    if isinstance(event_date, list):
+                        ax[i].axvline(x=event_date[0], color='r')
+                        ax[i].axvline(x=event_date[1], color='r')
+                    else:
+                        ax[i].axvline(x=event_date, color='r')
+
+                    # Create a Line2D object for the legend
+                    red_line = Line2D([], [], color='r', label='Manual Event Date')
+                # Add vertical lines for the significant dates
+                if significant_indices[0].size > 0 and np.any(significant_indices[0] != 0):
+                    for date in significant_dates:
+                        ax[i].axvline(x=date, color='g', linestyle='--')
+                    green_line = Line2D([], [], color='g', linestyle='--',label='Estimated Events')
+
+                ax[i].legend(handles=[red_line,green_line] + ax[i].get_legend_handles_labels()[0])
+        ##########################
+
+                fig.suptitle("Disturbance Analysis: 5σ-Event Detection")
+                plt.tight_layout()
+
+        plt.show()
+        pause(100)
+
+    def ccd_animation_3(self, opened_rasta_stack, coh_path_list, coherence_time_series_dates, savepath=None, titles=None):
+
+        for i, (code, data) in enumerate(self.grouped):
+            if code==1:
+                amplitude_diff = data.drop('dates').coherence_VH.values - self.grouped[6].drop('dates').coherence_VH.values
+                std_diff = np.abs(np.abs(amplitude_diff) / (np.abs(self.grouped[6].drop('dates').rolling(band=3, min_periods=2, center=True).std().coherence_VH.values) * 3))  ## 3 Sigma
+
+        # Create a 2x1 grid of subplots
+        fig, (ax_animation, ax_std_diff) = plt.subplots(nrows=2, ncols=1, figsize=(10, 15))
+
+
+        titles = [f[17:25] for f in os.listdir(coh_path_list[0]) if f.endswith('.tif')]
+        ims = []
+
+        for i in range(len(opened_rasta_stack.read())):  # 39
+            im = ax_animation.imshow(opened_rasta_stack.read(i + 1), animated=True, cmap="gray")
+            if i == 0:
+                ax_animation.imshow(opened_rasta_stack.read(i + 1), cmap="gray")
+
+            dates = coherence_time_series_dates.values
+            vline = ax_std_diff.axvline(x=dates[i], color='r', animated=True)
+            ims.append([im, vline])
+
+
+        ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True)
+
+        if titles is not None:
+            plt.suptitle(
+                f"InSAR Correlation Coefficient\n \n {datetime.datetime.strptime(titles[0], '%Y%m%d').strftime('%Y-%m-%d')} - {datetime.datetime.strptime(titles[-1], '%Y%m%d').strftime('%Y-%m-%d')}")
+
+        # Plot the std_diff data
+        ax_std_diff.plot(coherence_time_series_dates, std_diff)
+
+        ax_std_diff.set_xlabel('Dates')
+        ax_std_diff.set_ylabel('STD from Intact Forest')
+        ax_std_diff.set_title('STD from Intact Forest vs Dates')
+
+        if savepath is not None:
+            writer = animation.FFMpegWriter(
+                fps=3, metadata=dict(artist='Me'), bitrate=1800)
+            ani.save("CCD_animated.mp4", writer=writer)
+        plt.show()
+        plt.pause(10000)
+
+    def change_mapping(self,opened_rasta_stack):
+        '''
+        Map forest disturbance events
+        somplete the above differencing with the intact forest as baseline, but now I need to rope in the whole image,
+        so that it maps forest changes for the whole iamge.
+
+        rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[0]}'
+
+        '''
+
+        ## So, for every level/image stacked, I want to compare each pixel in that image to the corresponding single value of coherence obtained from the intact forest values.
+
+        # amplitude_diff = opened_rasta_stack.read() - self.grouped[6].drop('dates').coherence_VH.values
+        # std_diff = np.abs(np.abs(amplitude_diff) / (np.abs(self.grouped[6].drop('dates').rolling(band=3, min_periods=2, center=True).std().coherence_VH.values) * 3))  ## 3 Sigma
+
+        amplitude_diff = opened_rasta_stack.read()
+        xarray_values = self.grouped[6].drop('dates').coherence_VH.values
+
+        # Reshape the xarray_values to have the same dimensions as amplitude_diff
+        xarray_values_reshaped = xarray_values[:, np.newaxis]
+
+        # Perform the subtraction
+        amplitude_diff = amplitude_diff - xarray_values_reshaped
+        #std_diff = np.abs(np.abs(amplitude_diff) / (np.abs(self.grouped[6].drop('dates').rolling(band=3, min_periods=2, center=True).std().coherence_VH.values) * 3))  ## 3 Sigma
+
+        amplitude_diff = np.abs(amplitude_diff)
+
+        std_xarray_values = np.abs(self.grouped[6].drop('dates').rolling(band=3, min_periods=2, center=True).std().coherence_VH.values)
+        std_xarray_values_reshaped = std_xarray_values[:, np.newaxis] * 3
+
+        std_diff = amplitude_diff / std_xarray_values_reshaped
+
+        masked_image = np.where(std_diff[0] >= 5, std_diff[0], np.nan)
+
+        masked_image = np.where(std_diff[0] >= 15, std_diff[0], np.nan)
+        plt.imshow(masked_image)
+        plt.pause(100)
+
+
+
+
+
+
 
     def pct_clip(self, array, pct=[2, 98]):
         """
@@ -260,7 +506,7 @@ class CoherenceTimeSeries:
                 plt.scatter(self.cube.dates[:-1], self.pct_clip(perp_dist_diff), label='Perpendicular Distance')
                 plt.plot(ds.dates, ds.coherence_VH, label=self.cube["coherence_VH"].name)
                 
-    #            plt.plot( self.cube.dates[:-1],  self.cube["coherence_VH"][:-1].values, label=self.cube["coherence_VH"].name)
+                #plt.plot( self.cube.dates[:-1],  self.cube["coherence_VH"][:-1].values, label=self.cube["coherence_VH"].name)
                 plt.yticks([0, 1])
                 plt.legend()
                 plt.show()
@@ -272,7 +518,7 @@ class CoherenceTimeSeries:
         """
 
         print("The `radd_alert_data` method is still under construction.")
-        return
+        #return
 
         if self.shp:
             radd = rioxarray.open_rasterio("D:/Data/Radd_Alert.tif", masked=True).rio.clip(
@@ -321,29 +567,6 @@ class CoherenceTimeSeries:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def seasonal_decomposition(self, variable, code, freq=None, model='additive'):
         """
         Applies seasonal decomposition to a variable in the datacube for a given polygon code.
@@ -368,21 +591,21 @@ class CoherenceTimeSeries:
         decomposition = seasonal_decompose(ts, freq=freq, model=model, extrapolate_trend='freq')
 
         # Create a new xarray Dataset with the decomposition components
-        decomposed = xarray.Dataset({
-            'trend': (['time'], decomposition.trend),
-            'seasonal': (['time'], decomposition.seasonal),
-            'residual': (['time'], decomposition.resid)
-        }, coords={
-            'time': ts['time']
-        })
+        # decomposed = xarray.Dataset({
+        #     'trend': (['time'], decomposition.trend),
+        #     'seasonal': (['time'], decomposition.seasonal),
+        #     'residual': (['time'], decomposition.resid)
+        # }, coords={
+        #     'time': ts['time']
+        # })
 
-        return decomposed
+        #return decomposed
 
     def detect_seasonal_frequency(self, time_series):
         # Implement a function to automatically detect the seasonal frequency
         # of the time series (e.g., using autocorrelation or periodogram)
         # This is a placeholder for your custom implementation
-        raise NotImplementedError("Please implement a method to automatically detect the seasonal frequency")
+        #raise NotImplementedError("Please implement a method to automatically detect the seasonal frequency")
 
         """
         Automatically detects the seasonal frequency of the time series using the Lomb-Scargle periodogram.
@@ -414,15 +637,4 @@ class CoherenceTimeSeries:
 
         return dominant_period
         ## Please note that this method assumes that the time series is irregularly sampled. If your time series is regularly sampled (e.g., daily, weekly, or monthly), you can use other techniques, such as the Fast Fourier Transform (FFT), to find the dominant frequency more efficiently.
-
-
-
-
-
-
-
-
-
-
-
 

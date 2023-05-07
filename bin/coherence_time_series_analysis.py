@@ -26,8 +26,8 @@ if __name__ == '__main__':
     # Set variables
     path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'
     asf_df = pd.read_csv(path_asf_csv).drop(index=61)
-    window_size = 126#28#126#252
-    window = [9,34]#[2, 8]#[9,34]#[18, 69]
+    window = [18,69]#[2, 8]#[9,34]#[18, 69]
+    window_size = window[0]*14#28#126#252
     normalised = True
     stacks = 'Stacks_normalised' if normalised else 'Stacks_non_normalised'
     results_path = f'D:\\Data\\Results\\Coherence_Results\\{window_size}m_window' ## change this name
@@ -38,24 +38,30 @@ if __name__ == '__main__':
 
     # Build coherence time series object
     kalimantan = CoherenceTimeSeries(asf_df, coh_path_list, stack_path_list, window_size,window, shp, normalised)
-    if not os.listdir(stack_path_list):
-        kalimantan.write_rasterio_stack()
+
+
+    #if not stack_path_list:
+    kalimantan.write_rasterio_stack()
     kalimantan.build_cube()
 
     # Set plot titles, based on shp file
     titles = ['1st Disturbed Area', '2nd Disturbed Area', 'Sand & Water', 'Farmland', '3rd Disturbed Area', 'Intact Forest']
     #kalimantan.multiple_plots(titles)
+    #kalimantan.stats(titles)
+    #kalimantan.change_mapping(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[0]}'))
 
     # Uncomment the following for a single plot
-    kalimantan.single_plot(titles)
+    #kalimantan.single_plot(titles)
 
     # Uncomment the following for a coherence change detection animation
-    #ccd_animation.ccd_animation(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[0]}'),coh_path_list)
+    # ccd_animation.ccd_animation_withplot(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[0]}'), coh_path_list, kalimantan.cube.dates)
+    # ccd_animation.ccd_animation(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[0]}'), coh_path_list, )
+    kalimantan.ccd_animation_3(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[0]}'), coh_path_list,kalimantan.cube.dates)
 
     # Uncomment the following for a precipitation and perpendicular distance plot
-    perp_dist_diff = np.abs(asf_df[" Reference Perpendicular Baseline (meters)"] - asf_df[" Secondary Perpendicular Baseline (meters)"])
-    perp_dist_diff.name = 'Perpendicular_Distance'
-    kalimantan.precip_perpdist_plot(perp_dist_diff)
+    # perp_dist_diff = np.abs(asf_df[" Reference Perpendicular Baseline (meters)"] - asf_df[" Secondary Perpendicular Baseline (meters)"])
+    # perp_dist_diff.name = 'Perpendicular_Distance'
+    # kalimantan.precip_perpdist_plot(perp_dist_diff)
 
     # Uncomment the following for the distribution of disturbance events detced by the RADD alert system
     # kalimantan.radd_alert_plot()

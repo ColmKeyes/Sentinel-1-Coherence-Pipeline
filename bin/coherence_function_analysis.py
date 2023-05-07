@@ -24,7 +24,7 @@ pd.set_option('d'
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 from src.coherence_time_series import CoherenceTimeSeries
-from utils.ccd_animation import ccd_animation
+from utils.ccd_animation import ccd_animation_withplot
 import rasterio
 import matplotlib.pyplot as plt
 
