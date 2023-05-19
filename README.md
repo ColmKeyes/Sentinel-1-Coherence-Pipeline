@@ -113,28 +113,28 @@ Shown below are three coherence images obtained using different spatial averagin
 
 
 <p align="center">
-  <img src="images/Precip_SandWater_1869.png" alt="Image Description" width="30%">
+  <img src="images/Precip_SandWater_1869.png" alt="Image Description" width="100%">
 </p>
 
 <p align="center">
-  <img src="images/Perp_SandWater_1869.png" alt="Image Description" width="30%">
-</p>
-
-
-
-<p align="center">
-  <img src="images/Single_Plot_Coh_Intact.png" alt="Image Description" width="30%">
+  <img src="images/Perp_SandWater_1869.png" alt="Image Description" width="100%">
 </p>
 
 
 
 <p align="center">
-  <img src="images/Disturbance_Events_reordered.png" alt="Image Description" width="30%">
+  <img src="images/Single_Plot_Coh_Intact.png" alt="Image Description" width="100%">
 </p>
 
 
 
 <p align="center">
-  <img src="images/coherence_stack_with_plot.gif" alt="Image Description" width="30%">
+  <img src="images/Disturbance_Events_reordered.png" alt="Image Description" width="100%">
+</p>
+
+
+
+<p align="center">
+  <img src="images/coherence_stack_with_plot.gif" alt="Image Description" width="66%">
 </p>
 
