@@ -108,6 +108,30 @@ Shown below are three coherence images obtained using different spatial averagin
 </div>
 
 
+## Research Question 2: 
+# Temporal Analysis of Disturbance Events:
+
+
+<p align="center">
+  <img src="images/Precip_SandWater_1869.png" alt="Image Description" width="30%">
+</p>
+
+<p align="center">
+  <img src="images/Perp_SandWater_1869.png" alt="Image Description" width="30%">
+</p>
+
+
+
+<p align="center">
+  <img src="images/Single_Plot_Coh_Intact.png" alt="Image Description" width="30%">
+</p>
+
+
+
+<p align="center">
+  <img src="images/Disturbance_Events_reordered.png" alt="Image Description" width="30%">
+</p>
+
 
 
 <p align="center">
