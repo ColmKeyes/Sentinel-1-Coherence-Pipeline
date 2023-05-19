@@ -108,9 +108,38 @@ Shown below are three coherence images obtained using different spatial averagin
 </div>
 
 
+## Research Question 2: 
+# Temporal Analysis of Disturbance Events:
+
+
+Bones:
+
+The Affect of Precipitation in the two plots is overshadowed by the affect of the perpendicular baseline on the coherence estimations.
+From a visual inspecition one can see the how the value of coherence is strongly correlated with the perpendicular baseline or distance between two coherence pairs. 
+<p align="center">
+  <img src="images/Precip_SandWater_1869.png" alt="Image Description" width="100%">
+</p>
+
+<p align="center">
+  <img src="images/Perp_SandWater_1869.png" alt="Image Description" width="100%">
+</p>
+
 
 
 <p align="center">
-  <img src="images/coherence_stack_with_plot.gif" alt="Image Description" width="30%">
+  <img src="images/Single_Plot_Coh_Intact.png" alt="Image Description" width="100%">
+</p>
+
+This area of intact forest is the reference area for this study.
+
+
+<p align="center">
+  <img src="images/Disturbance_Events_reordered.png" alt="Image Description" width="100%">
+</p>
+
+
+
+<p align="center">
+  <img src="images/coherence_stack_with_plot.gif" alt="Image Description" width="66%">
 </p>
 
