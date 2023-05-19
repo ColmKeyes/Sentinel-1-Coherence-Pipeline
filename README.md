@@ -1,4 +1,6 @@
-# Sentinel-1-Coherence-Pipeline
+# Assessing Sentinel-1 Coherence Measures for Tropical Forest Disturbance Mapping
+## Sentinel-1-Coherence-Pipeline
+
 MSc Sentinel-1 Coherence Processing &amp; Analysis pipeline, using Snappy, Rasterio &amp; Xarray.
 
 
@@ -105,4 +107,10 @@ Shown below are three coherence images obtained using different spatial averagin
   </div>
 </div>
 
+
+
+
+<p align="center">
+  <img src="images/coherence_stack_with_plot.gif" alt="Image Description" width="30%">
+</p>
 
