@@ -6,7 +6,7 @@ MSc Sentinel-1 Coherence Processing &amp; Analysis pipeline, using Snappy, Raste
 
 
 <p align="center">
-  <img src="images/Planet_Disturbance_Event.gif" alt="Image Description" width="100%">
+  <img src="images/other/Planet_Disturbance_Event.gif" alt="Image Description" width="100%">
 </p>
 
 
@@ -54,8 +54,8 @@ This study focuses on the Central Kalimantan region of Indonesia on the island o
 
 
 <p align="center">
-  <img src="images/aquisition in borneo.PNG" alt="Image Description" width="40%">
-  <img src="images/subject_area.PNG" alt="Image Description" width="50%">
+  <img src="images/other/aquisition in borneo.PNG" alt="Image Description" width="40%">
+  <img src="images/other/subject_area.PNG" alt="Image Description" width="50%">
 </p>
 
 example acquisition over Borneo.
@@ -92,18 +92,18 @@ To obtain accurate and reliable coherence values for mapping forest disturbances
 Shown below are three coherence images obtained using different spatial averaging window sizes and pixel spacings. The images were generated using [2,8], [9,34], and [18,69] window sizes, respectively. As the window size increases, the resulting coherence estimate approaches the true coherence value obtained using infinite looks. The images visually demonstrate the impact of window size on coherence estimates and the importance of selecting an appropriate window size for a given application.
 <div style="display:flex; justify-content:center; align-items:center;">
   <div style="flex:50%; padding: 0px;">
-    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_28.PNG" alt="" width="30%"  style="margin-right: 10px;">
-    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_126.PNG" alt="" width="30%" >
-    <img src="images/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_252.PNG" alt="" width="30%" >
+    <img src="images/other/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_28.PNG" alt="" width="30%"  style="margin-right: 10px;">
+    <img src="images/other/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_126.PNG" alt="" width="30%" >
+    <img src="images/other/S1A_IW_SLC__1SDV_20210829_20210910_pol_VH_coherence_window_252.PNG" alt="" width="30%" >
   </div>
 </div>
 
 
 <div style="display:flex; justify-content:center; align-items:center;">
   <div style="flex:50%; padding: 0px;">
-    <img src="images/Intact_forest_2,8_time_series_plot.png" alt="" width="30%"  style="margin-right: 0px;">
-    <img src="images/Intact_forest_934_time_series_plot.png" alt="" width="30%" >  
-    <img src="images/Intact_forest_1869_time_series_plot.png" alt="" width="30%" >
+    <img src="images/single_plots/Intact_forest_2,8_time_series_plot.png" alt="" width="30%"  style="margin-right: 0px;">
+    <img src="images/single_plots/Intact_forest_934_time_series_plot.png" alt="" width="30%" >  
+    <img src="images/single_plots/Intact_forest_1869_time_series_plot.png" alt="" width="30%" >
   </div>
 </div>
 
@@ -117,11 +117,11 @@ Bones:
 The Affect of Precipitation in the two plots is overshadowed by the affect of the perpendicular baseline on the coherence estimations.
 From a visual inspecition one can see the how the value of coherence is strongly correlated with the perpendicular baseline or distance between two coherence pairs. 
 <p align="center">
-  <img src="images/Precip_SandWater_1869.png" alt="Image Description" width="100%">
+  <img src="images/perpdist_precip/Precip_SandWater_1869.png" alt="Image Description" width="100%">
 </p>
 
 <p align="center">
-  <img src="images/Perp_SandWater_1869.png" alt="Image Description" width="100%">
+  <img src="images/perpdist_precip/Perp_SandWater_1869.png" alt="Image Description" width="100%">
 </p>
 
 
@@ -129,13 +129,13 @@ This area of intact forest is the reference area for this study.
 
 
 <p align="center">
-  <img src="images/Single_Plot_Coh_Intact.png" alt="Image Description" width="100%">
+  <img src="images/single_plots/Single_Plot_Coh_Intact.png" alt="Image Description" width="100%">
 </p>
 
 We see disturbed forest areas in the three subplots on the right. Given the alarge coherence estimation windows used, we can see the clear difference between the intact forest and the disturbed forest areas.
 
 <p align="center">
-  <img src="images/Disturbance_Events_reordered.png" alt="Image Description" width="100%">
+  <img src="images/disturbance_event_analysis/Disturbance_Events_reordered.png" alt="Image Description" width="100%">
 </p>
 
 We can see below a visualisation of an affected area. Given the high coherence estimations the sensitivity of the system is clearly sufficient to detect changes in coherence at the 3 sigma level of significance. In fact, we see quite few iamges where a disturbance does not occur.
@@ -145,6 +145,6 @@ In our Farmland section, we can clearly see the periods of harvesting in Indones
 The sensitivity of the detection leads us to have the capacity to make use of the high resolution coherence data available. This still shows accurate events occuring. (I need to figure out a baseline of comparison for these event detections. I guess that my sand and water could be a basis?)
 
 <p align="center">
-  <img src="images/coherence_stack_with_plot.gif" alt="Image Description" width="66%">
+  <img src="images/ccd_animation/coherence_stack_with_plot.gif" alt="Image Description" width="66%">
 </p>
 
