@@ -25,9 +25,9 @@ def ccd_animation(opened_rasta_stack, coh_path_list, savepath=None, titles=None)
     ims = []
 
     for i in range(len(opened_rasta_stack.read())):  # 39
-        im = ax.imshow(opened_rasta_stack.read(i + 1), animated=True, cmap="gray")
+        im = ax.imshow(opened_rasta_stack.read(i + 1), animated=True, cmap="gray_r")
         if i == 0:
-            ax.imshow(opened_rasta_stack.read(i + 1), cmap="gray")  # , vmin=0, vmax=1)
+            ax.imshow(opened_rasta_stack.read(i + 1), cmap="gray_r")  # , vmin=0, vmax=1)
         ims.append([im])
 
     ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True)  # ,repeat_delay=10000)
