@@ -125,19 +125,24 @@ From a visual inspecition one can see the how the value of coherence is strongly
 </p>
 
 
+This area of intact forest is the reference area for this study.
+
 
 <p align="center">
   <img src="images/Single_Plot_Coh_Intact.png" alt="Image Description" width="100%">
 </p>
 
-This area of intact forest is the reference area for this study.
-
+We see disturbed forest areas in the three subplots on the right. Given the alarge coherence estimation windows used, we can see the clear difference between the intact forest and the disturbed forest areas.
 
 <p align="center">
   <img src="images/Disturbance_Events_reordered.png" alt="Image Description" width="100%">
 </p>
 
+We can see below a visualisation of an affected area. Given the high coherence estimations the sensitivity of the system is clearly sufficient to detect changes in coherence at the 3 sigma level of significance. In fact, we see quite few iamges where a disturbance does not occur.
 
+In our Farmland section, we can clearly see the periods of harvesting in Indonesia. These last from April-May and October-November.
+
+The sensitivity of the detection leads us to have the capacity to make use of the high resolution coherence data available. This still shows accurate events occuring. (I need to figure out a baseline of comparison for these event detections. I guess that my sand and water could be a basis?)
 
 <p align="center">
   <img src="images/coherence_stack_with_plot.gif" alt="Image Description" width="66%">
