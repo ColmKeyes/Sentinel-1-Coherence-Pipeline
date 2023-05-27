@@ -26,7 +26,7 @@ if __name__ == '__main__':
     # Set variables
     path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'
     asf_df = pd.read_csv(path_asf_csv).drop(index=61)
-    window = [9,34]#[2, 8]#[9,34]#[18, 69]
+    window = [18,69]#[2, 8]#[9,34]#[18, 69]
     window_size = window[0]*14#28#126#252
     normalised = True
     stacks = 'Stacks_normalised' if normalised else 'Stacks_non_normalised'
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
     #kalimantan.stats(titles)
 
-    kalimantan.change_mapping(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[1]}')) # make sure this correlates with coherence..
+    #kalimantan.change_mapping(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[1]}')) # make sure this correlates with coherence..
 
     # Uncomment the following for a single plot
     #kalimantan.single_plot(titles,plot_code=0)
@@ -77,6 +77,6 @@ if __name__ == '__main__':
     # kalimantan.precip_perpdist_plot(perp_dist_diff)
 
     # Uncomment the following for the distribution of disturbance events detced by the RADD alert system
-    #kalimantan.radd_alert_plot()
+    kalimantan.radd_alert_plot()
 
 

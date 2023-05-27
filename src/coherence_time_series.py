@@ -660,14 +660,14 @@ class CoherenceTimeSeries:
 
 
 
-
+        #Here, i need to remove non-forested areas from my plot.
 
         std_diff_xr = xarray.DataArray(exceeds_threshold.astype(int), dims=['band', 'height', 'width'])
         exceed_counts = std_diff_xr.rolling(band=21,min_periods=21).sum()
 
         exceed_counts_thresholded = exceed_counts >= 3
 
-        plt.title("Example Change Detection Raster")
+        plt.title(f"Change Detection Raster \n 3 Events Detected/year")
         plt.imshow(exceed_counts_thresholded[41])
         plt.pause(1000)
 
@@ -746,8 +746,8 @@ class CoherenceTimeSeries:
         #return
 
         if self.shp is not None:
-            radd = rioxarray.open_rasterio("D:/Data/Radd_Alert.tif", masked=True).rio.clip(
-                self.shp.geometry.values, self.shp.crs, from_disk=True)
+            radd = rioxarray.open_rasterio("D:/Data/Radd_Alert.tif", masked=True)#.rio.clip(
+                #self.shp.geometry.values, self.shp.crs, from_disk=True)
 
             radd_cube = make_geocube(self.shp, like=radd, measurements=['code'])
         else:
@@ -758,7 +758,7 @@ class CoherenceTimeSeries:
         radd_count = radd_stats.count()
         radd_count["alert_dates"] = (radd.dims, radd.values, radd.attrs, radd.encoding)
 
-        radd_count['dates'] = datetime.strptime(radd_cube.alert_date, '%y%j')
+        #radd_count['dates'] = datetime.strptime(radd_cube.alert_date, '%y%j')
 
         # two slightly different ways to build an xarray datacube
 
@@ -780,14 +780,17 @@ class CoherenceTimeSeries:
         radd_arrays_list = [radd_array1, radd_array2, radd_array4, radd_array5, radd_array6]
         # radd_array1.groupby([pd.Grouper(key='polygon3.0_dates', freq='W-MON')]).mean()['polygon3.0_values'].to_frame()
 
+        ##trying to get the radd alert with the highest count in the polygon?
         radd_arrays = [radd_df.groupby([pd.Grouper(key=str(radd_df.columns[0]), freq='D')]).mean()[str(radd_df.columns[1])].to_frame() for radd_df in radd_arrays_list]  # W-MON
 
         radd_xarray = pd.concat(radd_arrays).to_xarray()
 
-        # ax[i, j].scatter(radd_array[f'polygon{np.unique(radd_cube.code)[a]}_dates'][7:61] ,pct_clip(radd_array[f'polygon{np.unique(radd_cube.code)[a]}_values'][7:61],[.2,
+        #ax[i, j].scatter(radd_array[f'polygon{np.unique(radd_cube.code)[a]}_dates'][7:61] ,self.pct_clip(radd_array[f'polygon{np.unique(radd_cube.code)[a]}_values'][7:61],[.2,
         # 99.8]),label='Radd Alert Detections')#raddy_array.index,radd_xarray[f'polygon{np.unique(radd_cube.code)[a]}_values'],[0,100]))#f'polygon{np.unique(radd_cube.code)[
         # a]}_dates'
 
+        plt.imshow()
+        plt.pause(100)
     def seasonal_decomposition(self, variable, code, freq=None, model='additive'):
         """
         Applies seasonal decomposition to a variable in the datacube for a given polygon code.
