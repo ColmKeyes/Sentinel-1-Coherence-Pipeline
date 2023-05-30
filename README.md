@@ -126,7 +126,7 @@ This area has the highest signal-noise ratio and will acts as the baseline for o
 ### Study Area Coherence Time-Series:
 
 <p align="center">
-  <img src="images/disturbance_event_analysis/disturbance_events_coh_934_norolling.png" alt="Image Description" width="50%">
+  <img src="images/disturbance_event_analysis/disturbance_events_coh_934_norolling.png" alt="Image Description" width="100%">
 </p> 
 
 
