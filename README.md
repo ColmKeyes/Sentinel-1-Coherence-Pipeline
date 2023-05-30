@@ -114,7 +114,7 @@ Shown below are three coherence images obtained using different spatial averagin
 
 
 Bones:
-
+### Baseline:
 To build a temporal analysis and disturbance event detection algorithm, we firstly take a look at our "intact-forest baseline". 
 This area has the highest signal-noise ratio and will acts as the baseline for our forest disturbance detection algorithm. Any disturbances are calculated by measuring the deviance between an AOI and this "intact-forest baseline" area.
 
@@ -124,10 +124,7 @@ This area has the highest signal-noise ratio and will acts as the baseline for o
 </p> 
 
 
-
-This area of intact forest is the reference area for this study.
-
-
+### Disturbance Event Detection:
 
 We see disturbed forest areas in the three subplots on the right. Given the alarge coherence estimation windows used, we can see the clear difference between the intact forest and the disturbed forest areas.
 
@@ -143,6 +140,7 @@ In our Farmland section, we can clearly see the periods of harvesting in Indones
 
 The sensitivity of the detection leads us to have the capacity to make use of the high resolution coherence data available. This still shows accurate events occuring. (I need to figure out a baseline of comparison for these event detections. I guess that my sand and water could be a basis?)
 
+### CCD Animation:
 <p align="center">
   <img src="images/ccd_animation/ccd_animation_disturbance1.gif" alt="Image Description" width="66%">
 </p>
@@ -151,7 +149,7 @@ The sensitivity of the detection leads us to have the capacity to make use of th
 The Affect of Precipitation in the two plots is overshadowed by the affect of the perpendicular baseline on the coherence estimations.
 From a visual inspecition one can see the how the value of coherence is strongly correlated with the perpendicular baseline or distance between two coherence pairs. 
 
-
+### Perpendicular Baseline and Precipitation:
 
 <p align="center">
   <img src="images/perpdist_precip/Precip_SandWater_1869.png" alt="Image Description" width="50%">
@@ -161,8 +159,13 @@ From a visual inspecition one can see the how the value of coherence is strongly
   <img src="images/perpdist_precip/Perp_SandWater_1869.png" alt="Image Description" width="50%">
 </p>
 
+### Change Mapping:
+<p align="center">
+  <img src="images/change_detection_raster/CCD_raster_934.png" alt="Image Description" width="50%">
+</p>
 
-## Subject Areas:
+
+## Study Areas:
 
 ### Sand-Water Area:
 
