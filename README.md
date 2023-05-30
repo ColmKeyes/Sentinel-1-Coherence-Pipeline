@@ -123,6 +123,12 @@ This area has the highest signal-noise ratio and will acts as the baseline for o
   <img src="images/single_plots/Intact_forest_934.png" alt="Image Description" width="50%">
 </p> 
 
+### Study Area Coherence Time-Series:
+
+<p align="center">
+  <img src="images/disturbance_event_analysis/disturbance_events_coh_934_norolling.png" alt="Image Description" width="50%">
+</p> 
+
 
 ### Disturbance Event Detection:
 
