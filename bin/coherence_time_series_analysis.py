@@ -26,7 +26,7 @@ if __name__ == '__main__':
     # Set variables
     path_asf_csv = r'D:\Data\asf-sbas-pairs_12d_all_perp.csv'
     asf_df = pd.read_csv(path_asf_csv).drop(index=61)
-    window = [18,69]#[2, 8]#[9,34]#[18, 69]
+    window = [9,34]#[2, 8]#[9,34]#[18, 69]
     window_size = window[0]*14#28#126#252
     normalised = True
     stacks = 'Stacks_normalised' if normalised else 'Stacks_non_normalised'
@@ -54,14 +54,16 @@ if __name__ == '__main__':
     titles= ['Intact Forest','1st Disturbed Area','Sand & Water', '2nd Disturbed Area','Farmland', '3rd Disturbed Area']
 
 
-    #kalimantan.multiple_plots(titles)
 
-    #kalimantan.stats(titles)
+    kalimantan.stats(titles)
 
+    #kalimantan.hansen_forest_reprojection(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[1]}'))
     #kalimantan.change_mapping(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[1]}')) # make sure this correlates with coherence..
 
     # Uncomment the following for a single plot
     #kalimantan.single_plot(titles,plot_code=0)
+    #kalimantan.multiple_plots(titles)
+
 
     # Uncomment the following for a coherence change detection animation, with a plot.
 
@@ -69,14 +71,13 @@ if __name__ == '__main__':
     #ccd_animation.ccd_animation(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[0]}'), coh_path_list, )
 
     ## this is plot and image...
-    #kalimantan.ccd_animation(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[0]}'), coh_path_list,kalimantan.cube.dates)
-
+    #kalimantan.ccd_animation(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[0]}'), coh_path_list,kalimantan.cube.dates)#,savepath="D:\Data\Results\ccd_animation")
     # Uncomment the following for a precipitation and perpendicular distance plot
     # perp_dist_diff = np.abs(asf_df[" Reference Perpendicular Baseline (meters)"] - asf_df[" Secondary Perpendicular Baseline (meters)"])
     # perp_dist_diff.name = 'Perpendicular_Distance'
     # kalimantan.precip_perpdist_plot(perp_dist_diff)
 
     # Uncomment the following for the distribution of disturbance events detced by the RADD alert system
-    kalimantan.radd_alert_plot()
+    #kalimantan.radd_alert_plot()
 
 
