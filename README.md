@@ -162,6 +162,9 @@ The sensitivity of the detection leads us to have the capacity to make use of th
 
 
 ### CCD Animation:
+Two properties of the time series data are visible here. The first is the event detection algorithm. The growth and subsequent disappearence of the disturbed area is clear from the animations, while the disturbance events have successfully been deteremined in the time series.
+Another clear property is the variability due to perpendicular baseline. This appears as a general brightening and dimming of the image.
+
 <p align="center">
   <img src="images/ccd_animation/ccd_animation_disturbance1.gif" alt="Image Description" width="66%">
 </p>
@@ -202,4 +205,5 @@ EO_Browser and WorldCover2, two analysis ready browser applications, provide lab
   <img src="images/study_areas/sand_water_area/Sand_water_wordlcover2_2021.PNG" alt="Image Description" width="40%">
   <img src="images/study_areas/sand_water_area/Sand_water_IOLandCover_2022_Classification.PNG" alt="Image Description" width="40%">
 </p>
+
 
