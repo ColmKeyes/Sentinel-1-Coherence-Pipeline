@@ -143,7 +143,7 @@ These events will ber further studied in the following section.
 
 ### Disturbance Event Detection:
 
-Notes: These events need to be improved. They have incorrect legends, I think the legends are too in the way, the y-axis labels are not visible. Also the coherence value is averaged here so that needs to be improved.
+Notes: Take these from the CCD_mapping section. These events need to be improved. They have incorrect legends, I think the legends are too in the way, the y-axis labels are not visible. Also the coherence value is averaged here so that needs to be improved. 
 
 We see disturbed forest areas in the three subplots on the right. Given the large coherence estimation windows used, we can see the clear difference between the intact forest and the disturbed forest areas.
 
@@ -162,6 +162,9 @@ The sensitivity of the detection leads us to have the capacity to make use of th
 
 
 ### CCD Animation:
+Two properties of the time series data are visible here. The first is the event detection algorithm. The growth and subsequent disappearence of the disturbed area is clear from the animations, while the disturbance events have successfully been deteremined in the time series.
+Another clear property is the variability due to perpendicular baseline. This appears as a general brightening and dimming of the image.
+
 <p align="center">
   <img src="images/ccd_animation/ccd_animation_disturbance1.gif" alt="Image Description" width="66%">
 </p>
@@ -169,6 +172,7 @@ The sensitivity of the detection leads us to have the capacity to make use of th
 
 ### Perpendicular Baseline and Precipitation:
 
+Notes: This sectio nnneds to look at both types of coherence seperately, As it seems that VV is more sensitive to perp baseline than VH.
 
 The Affect of Precipitation in the two plots is overshadowed by the affect of the perpendicular baseline on the coherence estimations.
 From a visual inspecition one can see the how the value of coherence is strongly correlated with the perpendicular baseline or distance between two coherence pairs. 
@@ -182,6 +186,9 @@ From a visual inspecition one can see the how the value of coherence is strongly
 </p>
 
 ### Change Mapping:
+
+This mapping considers the 3 Sigma disturbance event detection from the previous event detection algorithm. It simply plots the regions where this 3 sigma disturbance event detection has occured three or more times during a single year period.
+
 <p align="center">
   <img src="images/change_detection_raster/CCD_raster_934.png" alt="Image Description" width="50%">
 </p>
@@ -190,4 +197,13 @@ From a visual inspecition one can see the how the value of coherence is strongly
 ## Study Areas:
 
 ### Sand-Water Area:
+This is a region consisting of water bodies with sparse areas of vegetation and sand. 
+EO_Browser and WorldCover2, two analysis ready browser applications, provide labels for this area. Each show a combination of water bodies, areas and sparse vegetation, areas of no vegetation and some built up areas. This area will exhibit strong reflection in the VV direction.
+<p align="center">
+  <img src="images/study_areas/sand_water_area/Sand_water_Planet_2023_2.PNG" alt="Image Description" width="40%">
+  <img src="images/study_areas/sand_water_area/Sand_water_USGS_GeoEyeMaxar_2.PNG" alt="Image Description" width="40%">
+  <img src="images/study_areas/sand_water_area/Sand_water_wordlcover2_2021.PNG" alt="Image Description" width="40%">
+  <img src="images/study_areas/sand_water_area/Sand_water_IOLandCover_2022_Classification.PNG" alt="Image Description" width="40%">
+</p>
+
 
