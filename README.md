@@ -199,7 +199,7 @@ EO_Browser and WorldCover2, two analysis ready browser applications, provide lab
 <p align="center">
   <img src="images/study_areas/sand_water_area/Sand_water_Planet_2023_2.PNG" alt="Image Description" width="40%">
   <img src="images/study_areas/sand_water_area/Sand_water_USGS_GeoEyeMaxar_2.PNG" alt="Image Description" width="40%">
-  <img src="images/study_areas/sand_water_area/Sand_water_worldcover2_2021.PNG" alt="Image Description" width="40%">
+  <img src="images/study_areas/sand_water_area/Sand_water_wordlcover2_2021.PNG" alt="Image Description" width="40%">
   <img src="images/study_areas/sand_water_area/Sand_water_IOLandCover_2022_Classification.PNG" alt="Image Description" width="40%">
 </p>
 
