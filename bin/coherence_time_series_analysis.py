@@ -55,10 +55,10 @@ if __name__ == '__main__':
 
 
 
-    kalimantan.stats(titles)
+    #kalimantan.stats(titles)
 
     #kalimantan.hansen_forest_reprojection(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[1]}'))
-    #kalimantan.change_mapping(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[1]}')) # make sure this correlates with coherence..
+    kalimantan.change_mapping(rasterio.open(f'{stack_path_list}\\{os.listdir(stack_path_list)[1]}')) # make sure this correlates with coherence..
 
     # Uncomment the following for a single plot
     #kalimantan.single_plot(titles,plot_code=0)

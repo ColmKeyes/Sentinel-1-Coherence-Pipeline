@@ -597,7 +597,7 @@ class CoherenceTimeSeries:
 
         # Open the forest data
         with rasterio.open('D:\Data\Hansen_GFC-2021-v1.9_treecover2000_00N_110E.tif') as forest_map_ds:
-            forest_mask = forest_map_ds.read(1)
+            forest_mask = forest_map_ds.read()
 
             # Allocate memory for the reprojected forest mask (will have the same dimensions as exceed_counts_thresholded)
             forest_mask_reprojected = np.empty((exceed_counts_thresholded_band_count, exceed_counts_thresholded_height, exceed_counts_thresholded_width))
