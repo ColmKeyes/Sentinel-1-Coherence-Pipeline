@@ -195,12 +195,11 @@ This mapping considers the 3 Sigma disturbance event detection from the previous
 
 ### Sand-Water Area:
 This is a region consisting of water bodies with sparse areas of vegetation and sand. 
-
+EO_Browser and WorldCover2, two analysis ready browser applications, provide labels for this area. Each show a combination of water bodies, areas and sparse vegetation, areas of no vegetation and some built up areas. This area will exhibit strong reflection in the VV direction.
 <p align="center">
-  <img src="images/study_areas/sand_water_area/Sand_water_Planet_2023_2.png" alt="Image Description" width="50%">
+  <img src="images/study_areas/sand_water_area/Sand_water_Planet_2023_2.PNG" alt="Image Description" width="40%">
+  <img src="images/study_areas/sand_water_area/Sand_water_USGS_GeoEyeMaxar_2.PNG" alt="Image Description" width="40%">
+  <img src="images/study_areas/sand_water_area/Sand_water_worldcover2_2021.PNG" alt="Image Description" width="40%">
+  <img src="images/study_areas/sand_water_area/Sand_water_IOLandCover_2022_Classification.PNG" alt="Image Description" width="40%">
 </p>
 
-
-<p align="center">
-  <img src="images/study_areas/sand_water_area/Sand_water_USGS_GeoEyeMaxar_2.png" alt="Image Description" width="50%">
-</p>
