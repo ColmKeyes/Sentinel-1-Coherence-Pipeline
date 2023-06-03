@@ -125,6 +125,17 @@ This area has the highest signal-noise ratio and will acts as the baseline for o
 
 ### Study Area Coherence Time-Series:
 
+
+#### Analysis: 
+
+A visual analysis does not show any obvious stand-out results. However, some patterns can be distinguished in this time series.
+The Intact-Forest Baseline has a low average coherence of 0.2(find exact!).
+The sand & water study area comprises of strong variability, with stronger VV coherence values compared to VH. This indicates...(Insert Info, THat there is water bodies.)
+There are some temporal patterns visible in the Farmland study area, which correlate with crop harvests during the Indonesian harvest seasons of Nov-Jan and April-Aug(Confirm these).
+This contrasts to the three distrubance events, which have some component of this low coherence along with regions of periodic high coherence values. 
+In the three disturbed areas it is clear that something occurs over these three years.
+These events will ber further studied in the following section.
+
 <p align="center">
   <img src="images/disturbance_event_analysis/disturbance_events_coh_934_norolling.png" alt="Image Description" width="100%">
 </p> 
@@ -132,12 +143,9 @@ This area has the highest signal-noise ratio and will acts as the baseline for o
 
 ### Disturbance Event Detection:
 
-We see disturbed forest areas in the three subplots on the right. Given the alarge coherence estimation windows used, we can see the clear difference between the intact forest and the disturbed forest areas.
+Notes: These events need to be improved. They have incorrect legends, I think the legends are too in the way, the y-axis labels are not visible. Also the coherence value is averaged here so that needs to be improved.
 
-<p align="center">
-  <img src="images/disturbance_event_analysis/3σ_Disturbance_Event_Detection_934.png" alt="Disturbance Event 934" width="100%">
-</p>
-
+We see disturbed forest areas in the three subplots on the right. Given the large coherence estimation windows used, we can see the clear difference between the intact forest and the disturbed forest areas.
 
 
 We can see below a visualisation of an affected area. Given the high coherence estimations the sensitivity of the system is clearly sufficient to detect changes in coherence at the 3 sigma level of significance. In fact, we see quite few iamges where a disturbance does not occur.
@@ -146,16 +154,24 @@ In our Farmland section, we can clearly see the periods of harvesting in Indones
 
 The sensitivity of the detection leads us to have the capacity to make use of the high resolution coherence data available. This still shows accurate events occuring. (I need to figure out a baseline of comparison for these event detections. I guess that my sand and water could be a basis?)
 
+
+<p align="center">
+  <img src="images/disturbance_event_analysis/3σ_Disturbance_Event_Detection_934.png" alt="Disturbance Event 934" width="100%">
+</p>
+
+
+
 ### CCD Animation:
 <p align="center">
   <img src="images/ccd_animation/ccd_animation_disturbance1.gif" alt="Image Description" width="66%">
 </p>
 
 
+### Perpendicular Baseline and Precipitation:
+
+
 The Affect of Precipitation in the two plots is overshadowed by the affect of the perpendicular baseline on the coherence estimations.
 From a visual inspecition one can see the how the value of coherence is strongly correlated with the perpendicular baseline or distance between two coherence pairs. 
-
-### Perpendicular Baseline and Precipitation:
 
 <p align="center">
   <img src="images/perpdist_precip/Precip_SandWater_1869.png" alt="Image Description" width="50%">
