@@ -207,3 +207,13 @@ EO_Browser and WorldCover2, two analysis ready browser applications, provide lab
 </p>
 
 
+### 1st Disturbed Area:
+This region consists of a disturbed area of forest. This area has been disturbed due to the clearing of forests for palm plantation. Intense clearing events occur at dates: (Fill in here)
+These events were detected visually using monthly Planet data available at Global Forest Watch. 
+
+<p align="center">
+  <img src="images/study_areas/1st_disturbed_area/planet_capture_Sept2020_1st2nd_comp_crop.png" alt="Image Description" width="40%">
+  <img src="images/study_areas/1st_disturbed_area/planet_capture_Jan2023_1st2nd_comp.PNG" alt="Image Description" width="40%">
+  <img src="images/study_areas/1st_disturbed_area/1st_disturbed_worldcover_2021.PNG" alt="Image Description" width="40%">
+  <img src="images/study_areas/1st_disturbed_area/1st_disturbed_iolanduse_2022.PNG" alt="Image Description" width="40%">
+</p>
