@@ -60,6 +60,8 @@ This study focuses on the Central Kalimantan region of Indonesia on the island o
 
 example acquisition over Borneo.
 
+<!---
+
 # Methods
 
 The methodology of this study consists of three main steps. Firstly, SAR images were pre-processed using the Sentinel-1 Toolbox and Python packages such as Snappy. The pre-processing involved steps such as co-registration, calibration and  terrain correction. Secondly, coherence images were generated from the pre-processed SAR images using the SNAP software. Finally, coherence time series were analyzed using custom Python scripts and packages such as Rasterio and Xarray. The analysis involves identifying areas of change and assessing the suitability of coherence measures for mapping forest disturbances in the study area.
@@ -217,3 +219,5 @@ These events were detected visually using monthly Planet data available at Globa
   <img src="images/study_areas/1st_disturbed_area/1st_disturbed_worldcover_2021.PNG" alt="Image Description" width="40%">
   <img src="images/study_areas/1st_disturbed_area/1st_disturbed_iolanduse_2022.PNG" alt="Image Description" width="40%">
 </p>
+
+--->
