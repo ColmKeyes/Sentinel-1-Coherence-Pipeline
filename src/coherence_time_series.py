@@ -23,6 +23,7 @@ import rasterio.plot
 from rasterio.warp import calculate_default_transform ,reproject
 from rasterio.windows import get_data_window, transform
 from rasterio.enums import Resampling
+from rasterio.mask import mask
 from geocube.api.core import make_geocube
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -40,7 +41,6 @@ pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 
-# noinspection PyUnreachableCode
 class CoherenceTimeSeries:
     """
     A class for generating coherence and backscatter time series data-cube from Sentinel-1 SLC products.
@@ -191,7 +191,6 @@ class CoherenceTimeSeries:
 
         self.grouped_ordered.sort(key=lambda x: order_dict[x[0]])
 
-
     def build_date_mask(self):
         ## Set up a mask for dates where the data is too far apart in the time series plots..
         dates_to_mask = [
@@ -234,8 +233,6 @@ class CoherenceTimeSeries:
 
         return mask
 
-
-
     def single_plot(self, titles,plot_code):
         """
         Plot the coherence time series for a single shp code in the Cube.
@@ -257,13 +254,13 @@ class CoherenceTimeSeries:
 
         for i, (code, ds) in enumerate(grouped_list):
             if i == plot_code:  ## "Intact Forest" code: 5
-                plt.plot(ds.dates[:,0].where(~mask), ds.coherence_VH, label=f'{ds.coherence_VH.name}')
-                plt.plot(ds.dates[:,0].where(~mask), ds.coherence_VV, label=f'{ds.coherence_VV.name}')
-                plt.title(f'{titles[i]}, Coherence Window: {self.window} ')  #Disturbance Event {plot_code}
-                plt.legend()
-                plt.ylim([0, 0.5])
-                plt.xlabel('Dates')
-                plt.ylabel("Correlation Coefficient")
+                plt.plot(ds.dates[:,0], ds.coherence_VH, label=f'{ds.coherence_VH.name}')
+                plt.plot(ds.dates[:,0], ds.coherence_VV, label=f'{ds.coherence_VV.name}')
+                plt.title(f'{titles[i]}, Coherence Window: {self.window} ',fontsize=18)  #Disturbance Event {plot_code}
+                plt.legend(prop={'size': 11})
+                plt.ylim([0, 1])
+                plt.xlabel('Dates',fontsize=18)
+                plt.ylabel("γ",fontsize=18)
                 plt.show()
                 plt.pause(100)
 
@@ -290,12 +287,6 @@ class CoherenceTimeSeries:
                 except (ValueError, TypeError):
                     event_dates_num.append(None)
 
-        #print(event_dates_num)
-
-        #event_dates_num = [[datetime.datetime.strptime(d, '%Y-%m-%d') if d is not None else None for d in sublist] for sublist in event_dates]
-
-        #event_dates_num = [datetime.datetime.strptime(d, '%Y-%m-%d') if d is not None else None for d in event_dates]
-
         # Define the index range of the gap
         start_idx = np.where(self.cube.dates == np.datetime64('2021-05-01'))[0][0]
         end_idx = np.where(self.cube.dates == np.datetime64('2021-07-24'))[0][0]
@@ -311,12 +302,6 @@ class CoherenceTimeSeries:
         #grouped = self.cube.where(~mask).drop('dim_0').groupby('code')  #.assign_coords(dates=masked_dates)
 
 
-        # # Plot the masked data
-        # plt.plot(self.cube['dates'], masked_cube['coherence_VH'])
-        # plt.show()
-        # plt.pause(100)
-
-
         coh_bsc_vars = [var for var in self.cube.variables if "coherence" in var]  #"backscatter" in var or
         # Group by the 'code' variable
 
@@ -326,15 +311,17 @@ class CoherenceTimeSeries:
         grouped_list.sort(key=lambda x: order_dict[x[0]])
 
         # Loop through the grouped data and plot each variable
-        fig, ax = plt.subplots(3, 2, figsize=(21, 7), sharey=True, sharex=True)
+        fig, ax = plt.subplots(3, 2, figsize=(14, 10), sharey=True, sharex=True)
         for var in coh_bsc_vars:
             ax = ax.flatten()
             for i, ((code, data), event_date) in enumerate(zip(self.grouped_ordered, event_dates_num)):
+                if code==5:
+                    continue
                 print(i)
                 #data1=data.where(~mask)
                 ax[i].plot(data['dates'][:,0].where(~self.mask), data.drop('dates')[var], label=str(var))#.rolling(band=3,min_periods=2, center=True).std()[var], label=str(var))
-                ax[i].set_xlabel('Dates')
-                ax[i].set_ylabel("Correlation Coefficient" if "coherence" in var else "Backscatter (dB)")
+                ax[i].set_xlabel('Dates',fontsize=18)
+                ax[i].set_ylabel("γ",fontsize=18)#"Correlation Coefficient" if "coherence" in var else "Backscatter (dB)",fontsize=18)
                 ax[i].set_ylim([0, 1])
                 ax[i].tick_params(axis='both', which='both', length=5, width=2)
                 #ax[i].autoscale(enable=True, axis='both', tight=True)
@@ -346,7 +333,7 @@ class CoherenceTimeSeries:
                 #         ax[i].axvline(x=event_date[1], color='r')#,label="Manually Detected Event")
                 #     else:
                 #         ax[i].axvline(x=event_date, color='r')
-                ax[i].legend()
+                ax[i].legend(prop={'size': 11})
 
                 # if event_dates and i < len(event_dates):
                 #     event_date = event_dates[i]
@@ -354,7 +341,7 @@ class CoherenceTimeSeries:
                 #     event_date = mdates.date2num(event_date)
                 #     ax[i].axvline(x=event_date, color='red')
 
-                fig.suptitle(f"Disturbance Analysis: Coherence Window: {self.window}")
+                fig.suptitle(f"Disturbance Analysis: Coherence Window: {self.window}",fontsize=18)
 
                 plt.tight_layout()
 
@@ -394,13 +381,15 @@ class CoherenceTimeSeries:
         ## Multiplot loop
         ##########################
         # Loop through the grouped data and plot each variable
-        fig, ax = plt.subplots(3, 2, figsize=(21, 7), sharey=True, sharex=True)
+        fig, ax = plt.subplots(3, 2, figsize=(14, 10), sharey=True, sharex=True)
         for var in coh_bsc_vars:
             ax = ax.flatten()
 
 
-            for i, ((code, data), event_date) in enumerate(zip(self.grouped_ordered, event_dates_num)):
 
+            for i, ((code, data), event_date) in enumerate(zip(self.grouped_ordered, event_dates_num)):
+                if code==4:
+                    continue
                 amplitude_diff = data.drop('dates').coherence_VH.values - self.grouped[6].drop('dates').coherence_VH.values
                 std_diff = np.abs(np.abs(amplitude_diff) / (np.abs(self.grouped[6].drop('dates').rolling(band=5, min_periods=3, center=True).std().coherence_VH.values))) ## 3 Sigma
 
@@ -421,15 +410,16 @@ class CoherenceTimeSeries:
                 significant_dates = significant_dates#[~sig_dates_mask]
 
                 #ax[i].plot(data['dates'][:, 0].where(~mask), data.drop('dates').rolling(band=3, min_periods=2, center=True).std()[var], label=str(var))
-                ax[i].plot(data['dates'][:, 0].where(~self.mask), std_diff, label=str(var))
-                ax[i].set_xlabel('Dates')
-                ax[i].set_ylabel("STD from I.F.")
-                ax[i].legend()
-                ax[i].set_ylim([0, 7])
+                ax[i].plot(data['dates'][:, 0].where(~self.mask), data[var] , label=str(var))
+                #ax[i].plot(data['dates'][:, 0].where(~self.mask), data.coherence_VH , label=str(var))
+                ax[i].set_xlabel('Dates',fontsize=18)
+                ax[i].set_ylabel("γ",fontsize=18)#"Correlation Coefficient",fontsize=18) #"STD from I.F.")
+                ax[i].legend(fontsize=14)
+                ax[i].set_ylim([0, 1])
                 ax[i].tick_params(axis='both', which='both', length=5, width=2)
                 # ax[i].autoscale(enable=True, axis='both', tight=True)
                 if titles:
-                    ax[i].set_title(titles[i])
+                    ax[i].set_title(titles[i],fontsize=18)
                 if event_date is not None:
                     if isinstance(event_date, list):
                         ax[i].axvline(x=event_date[0], color='r')
@@ -446,13 +436,14 @@ class CoherenceTimeSeries:
                     green_line = Line2D([], [], color='g', linestyle='--',label='Estimated Events')
 
                 try:
-                    ax[i].legend(handles=[red_line,green_line] + ax[i].get_legend_handles_labels()[0])
+                    ax[i].legend(handles=[red_line,green_line] + ax[i].get_legend_handles_labels()[0],prop={'size': 11})
                 except UnboundLocalError:
                     continue
 
         ##########################
 
-                fig.suptitle(f"Disturbance Event Detection\n \n3σ From Intact Forest  \n\nWindow: {self.window}")
+                fig.suptitle(f"Disturbance Event Detection\n \n3σ From Intact Forest  \n\nWindow: {self.window}",fontsize=18)
+                #fig.suptitle(f"Disturbance Analysis \n  Coherence Window: {self.window}",fontsize=18)
                 plt.tight_layout()
 
         plt.show()
@@ -540,14 +531,13 @@ class CoherenceTimeSeries:
 
         '''
 
-        ## So, for every level/image stacked, I want to compare each pixel in that image to the corresponding single value of coherence obtained from the intact forest values.
-
-        # amplitude_diff = opened_rasta_stack.read() - self.grouped[6].drop('dates').coherence_VH.values
-        # std_diff = np.abs(np.abs(amplitude_diff) / (np.abs(self.grouped[6].drop('dates').rolling(band=3, min_periods=2, center=True).std().coherence_VH.values) * 3))  ## 3 Sigma
+        ## for every level/image stacked, compare each pixel in that image to the corresponding single value of coherence obtained from the intact forest values.
 
         amplitude = opened_rasta_stack.read()
 
-        xarray_values = self.grouped[6].drop('dates').coherence_VH.values
+        amplitude = np.where(amplitude > 0, amplitude, np.nan)
+
+        xarray_values = self.grouped[4].drop('dates').coherence_VH.values
 
         # Reshape the xarray_values to have the same dimensions as amplitude_diff
         xarray_values_reshaped = xarray_values[:, np.newaxis]
@@ -559,21 +549,29 @@ class CoherenceTimeSeries:
 
         amplitude_diff = np.abs(amplitude_diff)
 
-        std_xarray_values = np.abs(self.grouped[6].drop('dates').rolling(band=5, min_periods=3, center=True).std().coherence_VH.values)
+        std_xarray_values = np.abs(self.grouped[4].drop('dates').rolling(band=5, min_periods=3, center=True).std().coherence_VH.values)
         std_xarray_values_reshaped = std_xarray_values[:, np.newaxis]
 
         std_diff = amplitude_diff / std_xarray_values_reshaped
 
         # Check where the std_diff exceeds 1
-        exceeds_threshold = std_diff > 3
+        exceeds_threshold = np.where(std_diff > 3, True, np.where(np.isnan(std_diff), np.nan, False))
 
+        # Create a mask of where the NaN values are
+        nan_mask = np.isnan(exceeds_threshold)
+        not_nan_mask = ~np.isnan(exceeds_threshold)
+        # Replace NaN values with 0
+        exceeds_threshold_no_nan = np.where(np.isnan(exceeds_threshold), 0, exceeds_threshold)
 
-        #Here, i need to remove non-forested areas from my plot.
+        # Convert to integer
+        std_diff_xr = xarray.DataArray(exceeds_threshold_no_nan.astype(int), dims=['band', 'height', 'width'])
 
-        std_diff_xr = xarray.DataArray(exceeds_threshold.astype(int), dims=['band', 'height', 'width'])
-        exceed_counts = std_diff_xr.rolling(band=21,min_periods=21).sum()
+        exceed_counts = std_diff_xr.rolling(band=23, center=False, min_periods=23).sum()
+        #exceed_counts = std_diff_xr.rolling(band=21, min_periods=21).sum()
+        #std_diff_xr = xarray.DataArray(exceeds_threshold.astype(int), dims=['band', 'height', 'width'])
+        #exceed_counts = std_diff_xr.rolling(band=21,min_periods=21).sum()
 
-        exceed_counts_thresholded = exceed_counts >= 3
+        exceed_counts_thresholded = np.where(exceed_counts >= 3,True,np.where(np.isnan(exceed_counts), np.nan, False))
 
         exceed_counts_height = exceed_counts_thresholded.shape[1]
         exceed_counts_width = exceed_counts_thresholded.shape[2]
@@ -584,7 +582,7 @@ class CoherenceTimeSeries:
 
         path = 'D:\Data\\'
         hansen_treecover2000 = rasterio.open(path + 'Hansen_GFC-2021-v1.9_treecover2000_00N_110E.tif')
-        hansen_lossyear = rasterio.open(path + 'Hansen_GFC-2021-v1.9_lossyear_00N_110E.tif')
+        hansen_lossyear = rasterio.open(path + 'Hansen_GFC-2022-v1.10_lossyear_00N_110E.tif')
 
 
         with opened_rasta_stack as exceed_counts_thresholded_ds:
@@ -610,32 +608,223 @@ class CoherenceTimeSeries:
                 src_crs=forest_map_ds.crs,
                 dst_transform=exceed_counts_thresholded_transform,
                 dst_crs=exceed_counts_thresholded_crs,
-                resampling=Resampling.bilinear
+                resampling=Resampling.nearest
             )
-
-        # Create a boolean mask
-        forest_mask_boolean = forest_mask_reprojected > 66
+        forest_mask_boolean = forest_mask_reprojected > 80
 
         # Convert the forest_mask_boolean to xarray dataarray
         forest_mask_xr = xarray.DataArray(forest_mask_boolean, dims=['band', 'height', 'width'])
+        forest_mask_xr_filled = xarray.concat([forest_mask_xr[0]] * 62, dim='band')
 
-        # Load your exceed_counts_thresholded data here
-        # exceed_counts_thresholded =
-        # Apply the mask to exceed_counts_thresholded
-        exceed_counts_thresholded_masked = exceed_counts_thresholded.where(forest_mask_xr)
+        exceed_counts_thresholded_masked = np.where((forest_mask_xr_filled) & (exceed_counts_thresholded > 0) & not_nan_mask, exceed_counts_thresholded, np.nan)
+        below_counts_thresholded_masked = np.where((forest_mask_xr_filled) & (exceed_counts_thresholded == 0) & not_nan_mask, exceed_counts_thresholded, np.nan)
 
-        plt.title(f"Change Detection Raster \n 3 Events Detected/year")
-        plt.imshow(exceed_counts_thresholded_masked[41])
-        plt.pause(1000)
+        # Assign non-NaN values to 1
+        below_counts_thresholded_masked = np.where(~np.isnan(below_counts_thresholded_masked), 1, np.nan)
 
 
-        # masked_image = np.where(std_diff[0] >= 5, std_diff[0], np.nan)
+        ## Total : 89526 pixels - Hansen 252m
+        #Average incidence angle over the area is 38.5 degrees.
+
+
+        ### Predicted values from coherence map
+
+        ## ConFusion Matrix
+
+        with rasterio.open('D:\Data\Hansen_GFC-2022-v1.10_lossyear_00N_110E.tif') as forest_loss_map_ds:
+            forest_loss_mask = forest_loss_map_ds.read()
+
+            # Allocate memory for the reprojected forest mask (will have the same dimensions as exceed_counts_thresholded)
+            forest_loss_mask_reprojected = np.empty((exceed_counts_thresholded_band_count, exceed_counts_thresholded_height, exceed_counts_thresholded_width))
+
+            # Reproject the forest mask to match the CRS, transformation and dimensions of exceed_counts_thresholded
+            reproject(
+                source=forest_loss_mask,
+                destination=forest_loss_mask_reprojected,
+                src_transform=forest_loss_map_ds.transform,
+                src_crs=forest_loss_map_ds.crs,
+                dst_transform=exceed_counts_thresholded_transform,
+                dst_crs=exceed_counts_thresholded_crs,
+                resampling=Resampling.nearest
+            )
+
+
+            ##############################
+            ## Sample Selection
+            ##############################
+            # Set a seed for reproducibility
+            seed_value = 42
+            np.random.seed(seed_value)
+
+            # Filtering based on the conditions
+            ## This has an improper shape, i thas a full empty array of 62..
+            forest_loss_mask_boolean = np.where((forest_loss_mask_reprojected >= 21) & (forest_loss_mask_reprojected < 22) & forest_mask_xr_filled & not_nan_mask,
+                                                forest_loss_mask_reprojected, np.nan)
+            disturbed_indices_hansen = np.argwhere(forest_loss_mask_boolean[0] == 21)
+
+
+            non_disturbed_condition = np.where(((forest_loss_mask_reprojected[0] == 0) | (forest_loss_mask_reprojected[0] >= 22)) & forest_mask_xr_filled & not_nan_mask, forest_loss_mask_reprojected,
+                                               np.nan)
+            non_disturbed_indices_hansen = np.argwhere((non_disturbed_condition[0])>=0)
+
+            # len(disturbed_indices_hansen)
+            # 3287
+            # len(non_disturbed_indices_hansen)
+            # 310915
+
+            exceed_counts_thresholded_masked_only21 = np.where((forest_loss_mask_reprojected[0] >= 21) & (forest_loss_mask_reprojected[0] < 22), exceed_counts_thresholded_masked[36], np.nan)
+            below_counts_thresholded_masked_only21 = np.where((forest_loss_mask_reprojected[0] == 0) | (forest_loss_mask_reprojected[0] >= 22), below_counts_thresholded_masked[36], np.nan)
+
+            # np.nansum(exceed_counts_thresholded_masked_only21)
+            # 1381.0
+            # np.nansum(below_counts_thresholded_masked_only21)
+            # 202315.0
+
+            # np.nansum(exceed_counts_thresholded_masked[36])
+            # 64631
+            # np.nansum(below_counts_thresholded_masked[36])
+            # 294498
+
+
+
+            random_disturbed_samples = disturbed_indices_hansen[np.random.choice(len(disturbed_indices_hansen), 348, replace=False)]
+            random_non_disturbed_samples = non_disturbed_indices_hansen[np.random.choice(len(non_disturbed_indices_hansen), 50, replace=False)]
+
+
+            ## sample coordinates:
+            # For disturbed samples
+            disturbed_rows = random_disturbed_samples[:, 0]
+            disturbed_cols = random_disturbed_samples[:, 1]
+            disturbed_coords = [forest_loss_mask_reprojected.xy(row, col) for row, col in zip(disturbed_rows, disturbed_cols)]
+
+            # For non-disturbed samples
+            non_disturbed_rows = random_non_disturbed_samples[:, 0]
+            non_disturbed_cols = random_non_disturbed_samples[:, 1]
+            non_disturbed_coords = [forest_loss_mask_reprojected.xy(row, col) for row, col in zip(non_disturbed_rows, non_disturbed_cols)]
+
+
+            ## rest
+            # Extract the actual (reference) values from the Hansen map for the sampled pixels
+            actual_disturbed_values = np.ones(len(random_disturbed_samples))
+            actual_non_disturbed_values = np.zeros(len(random_non_disturbed_samples))
+
+            # Extract predicted values from the coherence map for the same sampled pixels
+            # predicted_disturbed_values_coh = exceed_counts_thresholded_masked[36][tuple(random_disturbed_samples.T)]
+            # predicted_non_disturbed_values_coh = exceed_counts_thresholded_masked[36][tuple(random_non_disturbed_samples.T)]
+
+
+            predicted_disturbed_values_coh = exceed_counts_thresholded_masked_only21[tuple(random_disturbed_samples.T)]
+            predicted_non_disturbed_values_coh = exceed_counts_thresholded_masked_only21[tuple(random_non_disturbed_samples.T)]
+
+
+
+            # Convert predicted values into binary classification (1 for disturbed, 0 for non-disturbed)
+            predicted_disturbed_values_coh = (predicted_disturbed_values_coh > 0).astype(int)
+            predicted_non_disturbed_values_coh = (predicted_non_disturbed_values_coh > 0).astype(int)
+
+            # Combine actual and predicted values for generating the confusion matrix
+            actual_values = np.concatenate([actual_disturbed_values, actual_non_disturbed_values])
+            predicted_values = np.concatenate([predicted_disturbed_values_coh, predicted_non_disturbed_values_coh])
+
+
+
+
+        combined_matrix = np.full(exceed_counts_thresholded_masked[36].shape, np.nan)
+
+        # Assigning 1 where exceed_counts_thresholded_masked is not NaN
+        combined_matrix[~np.isnan(exceed_counts_thresholded_masked[36])] = 1
+
+        # Assigning 0 where below_counts_thresholded_masked is 1
+        combined_matrix[below_counts_thresholded_masked[36] == 1] = 0
+
+
+
         #
-        # masked_image = np.where(std_diff[0] >= 1, std_diff[0], np.nan)
-        # plt.title("Example Change Detection Raster")
-        # plt.imshow(masked_image)
-        #
-        # plt.pause(100)
+        # ####################
+        # ## plotting producer's map colourblind image with labels.
+        # ####################
+        import matplotlib.colors as mcolors
+
+        # 1. Create binary masks
+        disturbed_mask = np.where(forest_loss_mask_boolean[0] == 21, 1, np.nan)
+        non_disturbed_mask = np.where((non_disturbed_condition[0] >= 0), 0, np.nan)
+
+        # 2. Combine the masks
+        combined_mask = np.where(~np.isnan(disturbed_mask), disturbed_mask, non_disturbed_mask)
+
+        # # 3. Plot the combined matrix
+        fig, ax = plt.subplots(figsize=(12, 10))
+
+        # Create a custom colormap
+        cmap = mcolors.ListedColormap(['#377eb8', '#ff7f00'])
+        bounds = [-0.5, 0.5, 1.5]
+        norm = mcolors.BoundaryNorm(bounds, cmap.N)
+
+        # Use the transform to set x and y limits
+        x_min = 0 + exceed_counts_thresholded_transform.c
+        x_max = combined_mask.shape[1] * exceed_counts_thresholded_transform.a + exceed_counts_thresholded_transform.c
+        y_min = 0 + exceed_counts_thresholded_transform.f
+        y_max = combined_mask.shape[0] * exceed_counts_thresholded_transform.e + exceed_counts_thresholded_transform.f
+
+        # Display the image
+        cax = ax.imshow(combined_mask, cmap=cmap, norm=norm, extent=[x_min, x_max, y_min, y_max])
+
+        # Set labels, title, and other plot parameters
+        ax.set_xlabel('Longitude', fontsize=16)
+        ax.set_ylabel('Latitude', fontsize=16)
+        ax.set_title('GLAD Fores loss - 2021', fontsize=18)
+
+        # Create a legend
+        from matplotlib.patches import Patch
+        legend_labels = {
+            '#377eb8': 'Non-Disturbed',
+            '#ff7f00': 'Disturbed'
+        }
+        patches = [Patch(color=color, label=label) for color, label in legend_labels.items()]
+        ax.legend(handles=patches, loc='upper right', fontsize=14, frameon=True)
+
+        plt.tight_layout()
+        plt.show()
+        plt.pause(10)
+
+        ###################
+        ## plotting user's map colourblind image with labels.
+        ####################
+        import matplotlib.patches as mpatches
+
+        # Extract the transform
+        transform = exceed_counts_thresholded_transform
+        fig, ax = plt.subplots(figsize=(12, 10))
+
+        # Calculate the extent
+        left = transform.c
+        right = transform.c + transform.a * exceed_counts_thresholded_width
+        bottom = transform.f + transform.e * exceed_counts_thresholded_height
+        top = transform.f
+
+        extent = [left, right, bottom, top]
+
+        # Create a custom colormap for colorblind-friendly visualization
+        from matplotlib.colors import ListedColormap
+        cmap = ListedColormap(['#377eb8', '#ff7f00'])  # blue for 'Below Count', orange for 'Exceed Count'
+
+        # Plotting
+        plt.imshow(combined_matrix, extent=extent, cmap=cmap)  # Assuming combined_matrix is a 3D array and you're visualizing the first band
+        plt.xlabel('Longitude',fontsize=16)
+        plt.ylabel('Latitude',fontsize=16)
+        plt.title('3σ Disturbance Detections 2021',fontsize=18)
+
+        # Create legend
+        legend_labels = {0: 'Non-Disturbed', 1: 'Disturbed'}
+        patches = [mpatches.Patch(color='#377eb8', label=legend_labels[0]),
+                   mpatches.Patch(color='#ff7f00', label=legend_labels[1])]
+        legend=plt.legend(handles=patches, loc='upper right', fontsize=14)
+        for text in legend.get_texts():
+            text.set_fontsize(14)
+        plt.show()
+        plt.pause(10)
+
+
 
     def pct_clip(self, array, pct=[2, 98]):
         """
@@ -654,7 +843,7 @@ class CoherenceTimeSeries:
         clip[clip < 0] = 0
         return clip
 
-    def precip_perpdist_plot(self, perp_dist_diff):
+    def precip_perpdist_plot(self, perp_dist_diff, titles):
         """
         plot mean precipitation data over coherence time period
         along with perpendicular distance between coherence pairs.
@@ -680,17 +869,20 @@ class CoherenceTimeSeries:
 
 
         for i, (code, ds) in enumerate(grouped):
-            if i == 2:  ## "Intact Forest" code: 5
-                plt.plot(ds.dates, (ds.coherence_VH+ ds.coherence_VV)/2, label="Average Coherence",  linestyle='--')
-                plt.plot(self.cube.dates[:-1], self.pct_clip(perp_dist_diff), label='Perpendicular Distance')
-                #plt.scatter(prcp['dates'], self.pct_clip(prcp.prcp), label='Mean Precipitation')
+            if i == 0:  ## "Intact Forest" code: 5, sand == 2
+                #plt.plot(ds.dates, (ds.coherence_VH+ ds.coherence_VV)/2, label="Average Coherence"  )
+                plt.figure(figsize=(15,5))
+                plt.plot(ds.dates,  ds.coherence_VV, label="Coherence VV"  )
+                plt.plot(ds.dates, ds.coherence_VH, label="Coherence VH"  )
+                plt.plot(self.cube.dates[:-1], self.pct_clip(perp_dist_diff), label='Perpendicular Distance',linestyle='--')
+                plt.scatter(prcp['dates'], self.pct_clip(prcp.prcp), label='Mean Precipitation')
 
                 #plt.plot( self.cube.dates[:-1],  self.cube["coherence_VH"][:-1].values, label=self.cube["coherence_VH"].name)
                 plt.ylim([0, 1])
-                plt.legend()
-                plt.xlabel('Dates')
-                plt.ylabel('Normalised Values')
-                plt.title('Sand & Water: Effect of Perpendicular Baseline')#Perp Baseline & Mean Precipitation')
+                plt.legend(prop={'size': 11})
+                plt.xlabel('Dates',fontsize=18)
+                plt.ylabel('Normalised Values',fontsize=18)
+                plt.title(f'{titles[i]}: Effect of Perpendicular Baseline and Precipitation',fontsize=18)#Perp Baseline & Mean Precipitation')
                 plt.show()
                 plt.pause(1000)
 
@@ -715,7 +907,7 @@ class CoherenceTimeSeries:
         radd_count = radd_stats.count()
         radd_count["alert_dates"] = (radd.dims, radd.values, radd.attrs, radd.encoding)
 
-        #radd_count['dates'] = datetime.strptime(radd_cube.alert_date, '%y%j')
+        radd_count['dates'] = datetime.strptime(radd_cube.alert_date, '%y%j')
 
         # two slightly different ways to build an xarray datacube
 
@@ -738,16 +930,65 @@ class CoherenceTimeSeries:
         # radd_array1.groupby([pd.Grouper(key='polygon3.0_dates', freq='W-MON')]).mean()['polygon3.0_values'].to_frame()
 
         ##trying to get the radd alert with the highest count in the polygon?
-        #radd_arrays = [radd_df.groupby([pd.Grouper(key=str(radd_df.columns[0]), freq='D')]).mean()[str(radd_df.columns[1])].to_frame() for radd_df in radd_arrays_list]  # W-MON
+        radd_arrays = [radd_df.groupby([pd.Grouper(key=str(radd_df.columns[0]), freq='D')]).mean()[str(radd_df.columns[1])].to_frame() for radd_df in radd_arrays_list]  # W-MON
 
         #radd_xarray = pd.concat(radd_arrays).to_xarray()
 
-        #ax[i, j].scatter(radd_array[f'polygon{np.unique(radd_cube.code)[a]}_dates'][7:61] ,self.pct_clip(radd_array[f'polygon{np.unique(radd_cube.code)[a]}_values'][7:61],[.2,
-        # 99.8]),label='Radd Alert Detections')#raddy_array.index,radd_xarray[f'polygon{np.unique(radd_cube.code)[a]}_values'],[0,100]))#f'polygon{np.unique(radd_cube.code)[
-        # a]}_dates'
+        ax[i, j].scatter(radd_array[f'polygon{np.unique(radd_cube.code)[a]}_dates'][7:61] ,self.pct_clip(radd_array[f'polygon{np.unique(radd_cube.code)[a]}_values'][7:61],[.2,99.8]),label='Radd Alert Detections')#raddy_array.index,radd_xarray[f'polygon{np.unique(radd_cube.code)[a]}_values'],[0,100]))#f'polygon{np.unique(radd_cube.code)[ a]}_dates'
+        plt.scatter(radd_array[f'polygon{np.unique(radd_cube.code)[4]}_dates'][7:61], self.pct_clip(radd_array[f'polygon{np.unique(radd_cube.code)[4]}_values'][7:61], [.2, 99.8]), label='Radd Alert Detections')
 
-        plt.imshow()
+        plt.imshow(radd[1])
+        plt.title("Radd Alert Detections 2020 - 2023")
         plt.pause(100)
+
+    def hansen_forest_reprojection(self,opened_rasta_stack):
+
+        path = 'D:\Data\\'
+        #hansen_treecover2000 = rasterio.open(path + 'Hansen_GFC-2021-v1.9_treecover2000_00N_110E.tif')
+        #hansen_lossyear = rasterio.open(path+'Hansen_GFC-2021-v1.9_lossyear_00N_110E.tif')
+        hansen_forest = rasterio.open('D:\Data\Hansen_GFC-2021-v1.9_treecover2000_00N_110E.tif')
+        forest_mask = hansen_forest.read(1)
+
+
+        with opened_rasta_stack as exceed_counts_thresholded_ds:
+            exceed_counts_thresholded_crs = exceed_counts_thresholded_ds.crs
+            exceed_counts_thresholded_transform = exceed_counts_thresholded_ds.transform
+            exceed_counts_thresholded_width = exceed_counts_thresholded_ds.width
+            exceed_counts_thresholded_height = exceed_counts_thresholded_ds.height
+            exceed_counts_thresholded_band_count = exceed_counts_thresholded_ds.count
+
+
+
+            # Open the forest data
+            #with rasterio.open('D:\Data\Hansen_GFC-2021-v1.9_treecover2000_00N_110E.tif') as forest_map_ds:
+            #    forest_mask = forest_map_ds.read(1)
+
+                # Allocate memory for the reprojected forest mask (will have the same dimensions as exceed_counts_thresholded)
+            forest_mask_reprojected = np.empty((exceed_counts_thresholded_band_count, exceed_counts_thresholded_height, exceed_counts_thresholded_width))
+
+            # Reproject the forest mask to match the CRS, transformation and dimensions of exceed_counts_thresholded
+            reproject(
+                source=forest_mask,
+                destination=forest_mask_reprojected,
+                src_transform=hansen_forest.transform,
+                src_crs=hansen_forest.crs,
+                dst_transform=exceed_counts_thresholded_transform,
+                dst_crs=exceed_counts_thresholded_crs,
+                resampling=Resampling.bilinear
+            )
+
+
+            forest_mask_boolean = forest_mask_reprojected > 80
+
+            # Create a boolean mask
+            #forest_mask_boolean = forest_mask_reprojected > 66
+
+            # Convert the forest_mask_boolean to xarray dataarray
+            forest_mask_xr = xarray.DataArray(forest_mask_boolean, dims=[ 'bands','height', 'width'])
+            forest_mask_xr_filled = xarray.concat([forest_mask_xr[0]] * 62, dim='bands')
+
+            opened_rasta_array = xarray.DataArray(opened_rasta_stack.read(), dims=['bands','height', 'width'])
+            exceed_counts_thresholded_masked = opened_rasta_array.where((forest_mask_xr_filled) & (opened_rasta_array>0))
 
     def seasonal_decomposition(self, variable, code, freq=None, model='additive'):
         """
@@ -781,20 +1022,20 @@ class CoherenceTimeSeries:
         #     'time': ts['time']
         # })
 
-        #return decomposed
+        # return decomposed
 
     def detect_seasonal_frequency(self, time_series):
         # Implement a function to automatically detect the seasonal frequency
         # of the time series (e.g., using autocorrelation or periodogram)
         # This is a placeholder for your custom implementation
-        #raise NotImplementedError("Please implement a method to automatically detect the seasonal frequency")
+        # raise NotImplementedError("Please implement a method to automatically detect the seasonal frequency")
 
         """
         Automatically detects the seasonal frequency of the time series using the Lomb-Scargle periodogram.
-    
+
         Args:
             time_series (xr.DataArray): The input time series.
-    
+
         Returns:
             freq (int): The detected seasonal frequency.
         """
@@ -820,61 +1061,4 @@ class CoherenceTimeSeries:
         return dominant_period
         ## Please note that this method assumes that the time series is irregularly sampled. If your time series is regularly sampled (e.g., daily, weekly, or monthly), you can use other techniques, such as the Fast Fourier Transform (FFT), to find the dominant frequency more efficiently.
 
-    def hansen_forest_reprojection(self,opened_rasta_stack):
-
-        path = 'D:\Data\\'
-        #hansen_treecover2000 = rasterio.open(path + 'Hansen_GFC-2021-v1.9_treecover2000_00N_110E.tif')
-        #hansen_lossyear = rasterio.open(path+'Hansen_GFC-2021-v1.9_lossyear_00N_110E.tif')
-
-        #forest_mask = hansen_treecover2000.read(1)
-        #forest_mask_boolean = forest_mask > 0
-
-        #forest_mask_xr = xarray.DataArray(forest_mask_boolean, dims=['height', 'width'])
-        #exceed_counts_thresholded_masked = exceed_counts_thresholded.where(forest_mask_xr)
-        #amplitude = opened_rasta_stack.read(1)
-
-        #rioxarray.open_rasterio(os.path.join(self.stack_path_list, opened_rasta_stack), masked=True)
-
-        with opened_rasta_stack as exceed_counts_thresholded_ds:
-            exceed_counts_thresholded_crs = exceed_counts_thresholded_ds.crs
-            exceed_counts_thresholded_transform = exceed_counts_thresholded_ds.transform
-            exceed_counts_thresholded_width = exceed_counts_thresholded_ds.width
-            exceed_counts_thresholded_height = exceed_counts_thresholded_ds.height
-            exceed_counts_thresholded_band_count = exceed_counts_thresholded_ds.count
-
-
-        # Open the forest data
-        with rasterio.open('D:\Data\Hansen_GFC-2021-v1.9_treecover2000_00N_110E.tif') as forest_map_ds:
-            forest_mask = forest_map_ds.read(1)
-
-            # Allocate memory for the reprojected forest mask (will have the same dimensions as exceed_counts_thresholded)
-            forest_mask_reprojected = np.empty((exceed_counts_thresholded_band_count, exceed_counts_thresholded_height, exceed_counts_thresholded_width))
-
-            # Reproject the forest mask to match the CRS, transformation and dimensions of exceed_counts_thresholded
-            reproject(
-                source=forest_mask,
-                destination=forest_mask_reprojected,
-                src_transform=forest_map_ds.transform,
-                src_crs=forest_map_ds.crs,
-                dst_transform=exceed_counts_thresholded_transform,
-                dst_crs=exceed_counts_thresholded_crs,
-                resampling=Resampling.bilinear
-            )
-
-        # Create a boolean mask
-        forest_mask_boolean = forest_mask_reprojected > 66
-
-        # Convert the forest_mask_boolean to xarray dataarray
-        forest_mask_xr = xarray.DataArray(forest_mask_boolean, dims=['band', 'height', 'width'])
-
-        # Load your exceed_counts_thresholded data here
-        # exceed_counts_thresholded =
-        plt.imshow(forest_mask_xr[0])
-        plt.pause(1000)
-        # Apply the mask to exceed_counts_thresholded
-        exceed_counts_thresholded_masked = exceed_counts_thresholded.where(forest_mask_xr)
-
-        plt.title(f"Change Detection Raster \n 3 Events Detected/year")
-        plt.imshow(exceed_counts_thresholded_masked[41], vmin=0, vmax=1)
-        plt.pause(1000)
 

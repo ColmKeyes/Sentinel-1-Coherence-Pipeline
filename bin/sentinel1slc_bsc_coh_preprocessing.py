@@ -21,7 +21,8 @@ from src import sentinel1slc as slc
 
 # Define input parameters
 pols = ['VH']  # 'VH,VV'
-sentinel1_resolution = [14.04, 3.68]
+sentinel1_GroundRange_resolution = [14.04, 3.68]  ## this is the slant range resolution, not the ground range.
+sentinel1_SlantRange_resolution = [2.7, 22]
 iw_swath = 'IW2'
 first_burst_index = 4
 mode =   'backscatter' #'coherence'
@@ -48,9 +49,9 @@ for iy, pols in enumerate(pols):
                  speckle_filter='Lee',
                  speckle_filter_size=[5, 5],
                  product_type=product_type,
-                 outpath=outpath + '\\' + str(int(sentinel1_resolution[0] * window_size[ix][0])) + 'm_window'
+                 outpath=outpath + '\\' + str(int(sentinel1_GroundRange_resolution[0] * window_size[ix][0])) + 'm_window'
                          + '\\pol_' + str(pols) + str(outpath_window)
-                         + str(int(sentinel1_resolution[0] * window_size[ix][0])))
+                         + str(int(sentinel1_GroundRange_resolution[0] * window_size[ix][0])))
 
 
 
