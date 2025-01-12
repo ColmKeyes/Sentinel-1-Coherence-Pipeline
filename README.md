@@ -60,6 +60,18 @@ This study focuses on the Central Kalimantan region of Indonesia on the island o
 
 example acquisition over Borneo.
 
+
+
+<p align="center">
+  <img src="Planet_Disturbance_Event.gif" alt="Image Description" width="100%">
+</p>
+
+
+<p align="center">
+  <img src="Planet_Disturbance_Events_crop.gif" alt="Image Description" width="100%">
+</p>
+
+
 <!---
 
 # Methods
