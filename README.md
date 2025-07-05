@@ -7,7 +7,7 @@ A Python package for processing Sentinel-1 SLC data to produce coherence and bac
 
 ## Overview
 
-This package provides a complete pipeline for processing Sentinel-1 SAR data to generate coherence and backscatter time series for forest disturbance detection and monitoring. Originally developed for MSc thesis research on "Assessing Sentinel-1 Coherence Measures for Tropical Forest Disturbance Mapping" in Central Kalimantan, Indonesia.
+This package provides a complete pipeline for processing Sentinel-1 SAR data to generate coherence and backscatter products. Originally developed for MSc thesis research on "Assessing Sentinel-1 Coherence Measures for Tropical Forest Disturbance Mapping" in Central Kalimantan, Indonesia.
 
 ## Features
 
