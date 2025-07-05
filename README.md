@@ -207,6 +207,7 @@ These scripts can be run individually or the equivalent functionality is availab
 
 Contributions are welcome! Please feel free to submit issues, feature requests, or pull requests.
 
+<!-- 
 ## Citation
 
 If you use this package in your research, please cite:
@@ -215,6 +216,7 @@ If you use this package in your research, please cite:
 Keyes, C. (2023). Assessing Sentinel-1 Coherence Measures for Tropical Forest Disturbance Mapping. 
 MSc Thesis, Trinity College Dublin.
 ```
+-->
 
 ## License
 
@@ -225,7 +227,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ESA for Sentinel-1 data and SNAP toolbox
 - ASF for data access and search capabilities
 - Global Forest Watch for validation data
-- Trinity College Dublin for research support
 
 ## Contact
 
